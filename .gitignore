@@ -6,6 +6,8 @@
 **/.pytest_cache/
 **/.venv/
 **/venv/
+**/.mongodb/
+.runtime/
 
 .env
 **/.env
