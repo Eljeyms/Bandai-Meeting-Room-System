@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports · Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body class="admin" data-page="reports">
+  <aside class="side" id="sidebar"></aside>
+
+  <main class="content">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">Reports &amp; Dashboard</p>
+        <h1>Reports</h1>
+        <p>How rooms are actually being used, straight from sensor + booking data</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="exportBtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 19h16"/></svg></span> Export CSV</button>
+      </div>
+    </header>
+
+    <section class="golden-cols">
+      <div class="card block">
+        <div class="block-head"><h2>Utilization this week</h2><span class="badge badge-mute">All rooms</span></div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="card block">
+        <div class="block-head"><h2>Busiest rooms</h2></div>
+        <table>
+          <thead><tr><th>Room</th><th>Bookings</th><th>Now</th></tr></thead>
+          <tbody id="topRooms"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

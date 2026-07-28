@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Management · Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body class="admin" data-page="users">
+  <aside class="side" id="sidebar"></aside>
+
+  <main class="content">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">User Management</p>
+        <h1>Users</h1>
+        <p>Admins manage everything, Schedulers book rooms, Members join meetings</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="newUserBtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> Add user</button>
+      </div>
+    </header>
+
+    <section class="card block">
+      <table>
+        <thead><tr><th>User</th><th>Department</th><th>Role</th><th>Status</th><th></th></tr></thead>
+        <tbody id="userRows"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- User modal -->
+  <div class="modal-backdrop" id="userModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3 id="userModalTitle">Add user</h3>
+      <div class="field"><label for="uName">Full name</label><input id="uName" placeholder="e.g. A. Tanaka" /></div>
+      <div class="field"><label for="uEmail">Email</label><input id="uEmail" type="email" placeholder="name@bandainamco.com" /></div>
+      <div class="field"><label for="uDept">Department</label><input id="uDept" placeholder="e.g. Product" /></div>
+      <div class="field">
+        <label for="uRole">Role</label>
+        <select id="uRole">
+          <option>Member</option>
+          <option>Scheduler</option>
+          <option>Admin</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('userModal')">Cancel</button>
+        <button class="btn btn-primary" id="saveUser">Save user</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

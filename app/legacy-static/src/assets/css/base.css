@@ -1,0 +1,137 @@
+/* Base styles shared by user + admin UI */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 16px; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--ink);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  margin: 0;
+  line-height: 1.15;
+}
+
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; font-size: var(--fs-base); }
+
+/* ---- Reusable bits ---- */
+.eyebrow {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.card {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.btn:active { transform: scale(.97); }
+.btn:focus-visible { outline: 3px solid var(--bn-red-soft); outline-offset: 2px; }
+
+.btn-primary { background: var(--bn-red); color: #fff; }
+.btn-primary:hover { background: var(--bn-red-dark); }
+.btn-ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--line); }
+.btn-ghost:hover { border-color: var(--ink-mute); }
+.btn-danger-ghost { background: transparent; color: var(--bn-red); border: 1px solid var(--bn-red-soft); }
+.btn-danger-ghost:hover { background: var(--bn-red-soft); }
+
+.badge {
+  display: inline-block;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: 99px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+.badge-busy { background: var(--bn-red-soft); color: var(--bn-red); }
+.badge-free { background: color-mix(in srgb, var(--state-free) 14%, white); color: var(--state-free); }
+.badge-mute { background: var(--canvas); color: var(--ink-mute); }
+
+/* ---- Icon sizing (shared SVG icon set, replaces emoji) ---- */
+.icon, .ico, .status-icon, .chev, .btn svg, .icon-btn svg {
+  display: inline-flex;
+  width: 1em; height: 1em;
+  flex-shrink: 0;
+}
+.icon svg, .ico svg, .status-icon svg, .chev svg { width: 100%; height: 100%; }
+.icon-btn svg { width: 1.1rem; height: 1.1rem; }
+
+/* ---- Bandai Namco logo mark ---- */
+.bn-mark {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.bn-mark .logo-img {
+  width: auto;
+  max-width: 9rem;
+  max-height: 3.75rem;
+  height: auto;
+  display: block;
+}
+.bn-mark .tagline {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--ink-mute);
+}
+
+/* ---- Modal ---- */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(23,23,27,.45);
+  display: none;
+  align-items: center; justify-content: center;
+  z-index: 50;
+  padding: var(--sp-4);
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  width: min(30.9rem, 100%);   /* 500px ≈ golden width for forms */
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-panel);
+}
+.modal h3 { font-size: var(--fs-lg); margin-bottom: var(--sp-4); }
+.modal .field { margin-bottom: var(--sp-4); }
+.modal label { display: block; font-size: var(--fs-sm); font-weight: 600; color: var(--ink-soft); margin-bottom: var(--sp-1); }
+.modal input, .modal select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  background: var(--canvas);
+}
+.modal input:focus, .modal select:focus { outline: 2px solid var(--bn-red-soft); border-color: var(--bn-red); }
+.modal .modal-actions { display: flex; justify-content: flex-end; gap: var(--sp-3); margin-top: var(--sp-5); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

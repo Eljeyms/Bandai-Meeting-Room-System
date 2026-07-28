@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body class="admin" data-page="dashboard">
+  <aside class="side" id="sidebar"></aside>
+
+  <main class="content">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">Reports &amp; Dashboard</p>
+        <h1>Dashboard</h1>
+        <p>Live occupancy and today's activity across all rooms</p>
+      </div>
+    </header>
+
+    <section class="stat-grid" id="statGrid"></section>
+
+    <section class="golden-cols">
+      <div class="card block">
+        <div class="block-head"><h2>Rooms right now</h2><span class="badge badge-busy">● Live</span></div>
+        <table>
+          <thead><tr><th>Room</th><th>Status</th><th>Current meeting</th></tr></thead>
+          <tbody id="liveRooms"></tbody>
+        </table>
+      </div>
+      <div class="card block">
+        <div class="block-head"><h2>Up next</h2></div>
+        <table>
+          <thead><tr><th>Meeting</th><th>Starts</th></tr></thead>
+          <tbody id="upNext"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

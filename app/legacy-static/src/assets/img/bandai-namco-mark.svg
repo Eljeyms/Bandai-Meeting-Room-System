@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300" role="img" aria-label="Bandai Namco">
+  <!-- speech-bubble tail (drawn first so the bubble's border covers the seam) -->
+  <polygon points="66,230 176,230 96,298" fill="#E60012" />
+  <polygon points="80,230 154,230 100,278" fill="#FFFFFF" />
+
+  <!-- speech-bubble body -->
+  <rect x="38" y="16" width="434" height="234" rx="40"
+        fill="#FFFFFF" stroke="#E60012" stroke-width="20" />
+
+  <!-- wordmark, forced to a fixed width so it reads the same across fonts -->
+  <text x="65" y="120" textLength="380" lengthAdjust="spacingAndGlyphs"
+        font-family="'Poppins', 'Segoe UI', Arial, sans-serif"
+        font-weight="800" font-size="100"
+        fill="#111111">BANDAI</text>
+  <text x="65" y="222" textLength="380" lengthAdjust="spacingAndGlyphs"
+        font-family="'Poppins', 'Segoe UI', Arial, sans-serif"
+        font-weight="800" font-size="100"
+        fill="#111111">NAMCO</text>
+</svg>

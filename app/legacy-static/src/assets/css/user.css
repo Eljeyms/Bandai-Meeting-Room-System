@@ -1,0 +1,262 @@
+/* User UI — tablet room display
+   Layout is a golden section: schedule rail 38.2% / status stage 61.8% */
+
+body.tablet {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--paper) 0%, var(--canvas) 100%);
+}
+
+/* ---- Top bar ---- */
+.tablet-top {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  padding-right: var(--sp-5);
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.tablet-top .bn-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 7.5rem;
+  max-width: 100%;
+}
+.tablet-top .bn-mark .logo-img {
+  width: 100%;
+  max-width: 7.5rem;
+}
+.room-title {
+  padding-top: 0;
+  min-width: 0;
+  flex: 1;
+}
+.room-title h1 { font-size: var(--fs-xl); font-weight: 700; }
+.room-title p { color: var(--ink-mute); font-size: var(--fs-md); margin-top: var(--sp-1); }
+.tablet-clock {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-width: 12rem;
+}
+.tablet-clock .date { color: var(--ink-soft); font-size: var(--fs-md); }
+.tablet-clock .divider { width: 2px; height: var(--sp-5); background: var(--line); }
+.tablet-clock .time { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-lg); }
+.tablet-clock .time span { font-size: var(--fs-base); font-weight: 600; color: var(--ink-soft); }
+
+/* ---- Golden split main ---- */
+.tablet-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: var(--split-minor) var(--split-major); /* 38.2 / 61.8 */
+  gap: var(--sp-5);
+  padding: var(--sp-5);
+  padding-top: var(--sp-4);
+  min-height: 0;
+}
+
+/* ---- Left rail: schedule ---- */
+.rail { display: flex; flex-direction: column; gap: var(--sp-4); min-height: 0; }
+
+.panel {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--sp-4);
+}
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--sp-4);
+}
+.panel-head h2 { font-size: var(--fs-md); font-weight: 600; }
+.panel-head a { color: var(--bn-red); font-weight: 600; font-size: var(--fs-sm); }
+
+.sched-list { display: flex; flex-direction: column; gap: var(--sp-3); overflow-y: auto; }
+.sched-item {
+  display: flex; align-items: center; gap: var(--sp-3);
+  background: var(--canvas);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  position: relative;
+  overflow: hidden;
+}
+.sched-item::before {
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 0.35rem;
+  background: var(--accent, var(--bn-red));
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.sched-item .ico {
+  width: var(--sp-5); height: var(--sp-5);
+  border-radius: var(--radius-sm);
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--accent, var(--bn-red)) 12%, #fff);
+  color: var(--accent, var(--bn-red));
+  font-size: var(--fs-md);
+}
+.sched-item .meta { flex: 1; }
+.sched-item .meta strong { display: block; font-size: var(--fs-base); }
+.sched-item .meta span { color: var(--ink-mute); font-size: var(--fs-sm); }
+.sched-item .chev { color: var(--bn-red); font-size: var(--fs-md); }
+
+.ongoing .host-row { color: var(--ink-soft); font-size: var(--fs-sm); line-height: 1.7; margin-top: var(--sp-3); }
+
+/* ---- Right: status stage (the signature element) ---- */
+.stage {
+  border: 1.5px solid var(--bn-red-soft);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-5);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.stage-inner {
+  width: 100%;
+  max-width: 61.8%;
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6) var(--sp-5);
+  text-align: center;
+  transition: background .4s ease;
+}
+.stage.busy .stage-inner { background: linear-gradient(160deg, color-mix(in srgb, var(--bn-red) 5%, white) 0%, var(--bn-red-soft) 100%); }
+.stage.free .stage-inner { background: linear-gradient(160deg, color-mix(in srgb, var(--state-free) 6%, white) 0%, color-mix(in srgb, var(--state-free) 14%, white) 100%); }
+
+.status-word {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-giant);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.stage.busy .status-word { color: var(--bn-red); }
+.stage.free .status-word { color: var(--state-free); }
+
+/* φ divider: dot sits at the 61.8% point of the line */
+.phi-divider {
+  position: relative;
+  height: 2px;
+  margin: var(--sp-5) auto;
+  width: 80%;
+}
+.stage.busy .phi-divider { background: var(--bn-red); }
+.stage.free .phi-divider { background: var(--state-free); }
+.phi-divider::after {
+  content: "";
+  position: absolute;
+  left: 61.8%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.status-icon { font-size: var(--fs-xxl); line-height: 1; }
+.stage.busy .status-icon { color: var(--bn-red); }
+.stage.free .status-icon { color: var(--state-free); }
+
+.status-sub {
+  margin-top: var(--sp-4);
+  font-size: var(--fs-md);
+  color: var(--ink-soft);
+}
+
+/* dotted flourish, bottom-right like the reference */
+.stage::after {
+  content: "";
+  position: absolute;
+  right: -1rem; bottom: -1rem;
+  width: 8.09rem; height: 5rem;
+  background-image: radial-gradient(var(--bn-red) 1.5px, transparent 1.6px);
+  background-size: 13px 13px;
+  opacity: .55;
+  mask-image: linear-gradient(135deg, transparent 40%, #000 100%);
+}
+
+/* ---- Footer ---- */
+.tablet-foot {
+  border-top: 3px solid var(--bn-red);
+  padding: var(--sp-3) var(--sp-5);
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+  flex-wrap: wrap;
+  background: var(--paper);
+  justify-content: space-between;
+}
+.tablet-foot strong { color: var(--bn-red); font-family: var(--font-display); }
+.tablet-foot span { color: var(--ink-mute); font-size: var(--fs-sm); }
+
+@media (max-width: 900px) {
+  body.tablet { height: auto; overflow: auto; }
+  .tablet-main { grid-template-columns: 1fr; }
+  .status-word { font-size: var(--fs-xxl); }
+  .stage-inner { max-width: 100%; }
+}
+
+/* ============================================================
+   ROOMS OVERVIEW — lobby display, all rooms at a glance
+   ============================================================ */
+body.overview { min-height: 100vh; display: flex; flex-direction: column; }
+
+.overview-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  padding: 0 var(--sp-5) var(--sp-3);
+  flex-wrap: wrap;
+}
+.bn-mark.small {
+  min-width: 6rem;
+  flex: 0 0 auto;
+}
+.bn-mark.small .logo-img { width: 5.5rem; max-width: 100%; }
+.overview-head {
+  padding: var(--sp-4) 0;
+  min-width: 0;
+  flex: 1 1 35rem;
+}
+.overview-head h1 { font-size: var(--fs-xl); font-weight: 700; margin-top: var(--sp-2); word-break: break-word; }
+.overview-head p { color: var(--ink-mute); margin-top: var(--sp-1); }
+
+.overview-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  gap: var(--sp-4);
+  padding: 0 var(--sp-5) var(--sp-5);
+}
+
+.room-card {
+  padding: var(--sp-4);
+  display: flex; flex-direction: column;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+.room-thumb {
+  height: 5.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--canvas);
+  color: var(--ink-mute);
+  display: grid; place-items: center;
+  margin-bottom: var(--sp-4);
+}
+.room-thumb svg { width: 4.5rem; height: auto; }
+.room-card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.room-card-head h2 { font-size: var(--fs-md); font-weight: 700; }
+.room-cap { color: var(--ink-mute); font-size: var(--fs-sm); margin-top: var(--sp-1); margin-bottom: var(--sp-4); }
+.room-card .sched-list { gap: var(--sp-2); }
+.room-card .sched-item { padding: var(--sp-3); }
+.room-empty { color: var(--ink-mute); font-size: var(--fs-sm); padding: var(--sp-3) 0; }
+
+@media (max-width: 700px) {
+  .overview-top { padding: 0 var(--sp-4); }
+  .overview-grid { grid-template-columns: 1fr; padding: 0 var(--sp-4) var(--sp-4); }
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Room Configuration · Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body class="admin" data-page="rooms">
+  <aside class="side" id="sidebar"></aside>
+
+  <main class="content">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">Configuration</p>
+        <h1>Room Configuration</h1>
+        <p>Each room pairs an occupancy sensor with the tablet mounted at its door</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="newRoomBtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> Add room</button>
+      </div>
+    </header>
+
+    <section class="card block">
+      <table>
+        <thead><tr><th>Room</th><th>Capacity</th><th>Sensor / Tablet</th><th>Status</th><th></th></tr></thead>
+        <tbody id="roomRows"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- Room modal -->
+  <div class="modal-backdrop" id="roomModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3 id="roomModalTitle">Add room</h3>
+      <div class="field"><label for="rName">Room name</label><input id="rName" placeholder="e.g. Meeting Room 4A" /></div>
+      <div class="field"><label for="rFloor">Floor</label><input id="rFloor" placeholder="e.g. 4F" /></div>
+      <div class="field"><label for="rCap">Capacity (seats)</label><input id="rCap" type="number" min="1" placeholder="8" /></div>
+      <div class="field"><label for="rSensor">Occupancy sensor ID</label><input id="rSensor" placeholder="e.g. PIR-4A-01" /></div>
+      <div class="field"><label for="rTablet">Tablet ID</label><input id="rTablet" placeholder="e.g. TAB-4A" /></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('roomModal')">Cancel</button>
+        <button class="btn btn-primary" id="saveRoom">Save room</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

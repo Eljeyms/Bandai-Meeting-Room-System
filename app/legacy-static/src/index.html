@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bandai Namco · Meeting Room System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <style>
+    body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: var(--sp-6) var(--sp-4); }
+    .launcher { width: min(56rem, 100%); }
+    .launcher-head { text-align: center; margin-bottom: var(--sp-6); }
+    .launcher-head .bn-mark { margin: 0 auto var(--sp-5); }
+    .launcher-head .bn-mark .logo-img { width: 11rem; }
+    .launcher-head h1 { font-size: var(--fs-xl); }
+    .launcher-head p { color: var(--ink-mute); margin-top: var(--sp-2); }
+
+    /* Shared section scaffolding */
+    .launcher-section { margin-bottom: var(--sp-6); }
+    .launcher-section .eyebrow { display: block; margin-bottom: var(--sp-2); }
+    .launcher-section .section-note { color: var(--ink-mute); font-size: var(--fs-sm); margin-bottom: var(--sp-4); }
+
+    /* ---- Tablet Displays: kiosk cards, one per physical device ---- */
+    .tablet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: var(--sp-4); }
+    .tablet-card {
+      display: block; padding: var(--sp-5) var(--sp-4);
+      border-radius: var(--radius-lg); background: var(--paper);
+      box-shadow: var(--shadow-card); border-top: 5px solid var(--bn-red);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .tablet-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-panel); }
+    .tablet-card .ico { width: 2.618rem; height: 2.618rem; margin: 0 auto; color: var(--bn-red); }
+    .tablet-card strong { display: block; font-family: var(--font-display); font-size: var(--fs-md); margin-top: var(--sp-3); text-align: center; }
+    .tablet-card span { display: block; color: var(--ink-mute); font-size: var(--fs-sm); margin-top: var(--sp-1); text-align: center; }
+
+    /* ---- Admin Console: deliberately distinct — dark, staff-only tone ---- */
+    .admin-panel {
+      display: flex; align-items: center; gap: var(--sp-4);
+      background: var(--ink); color: #fff;
+      border-radius: var(--radius-lg); padding: var(--sp-5);
+      box-shadow: var(--shadow-card);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .admin-panel:hover { transform: translateY(-3px); box-shadow: var(--shadow-panel); }
+    .admin-panel .ico {
+      width: 3.4rem; height: 3.4rem; flex-shrink: 0;
+      display: grid; place-items: center;
+      background: var(--bn-red); border-radius: var(--radius-md);
+      padding: var(--sp-3);
+    }
+    .admin-panel strong { display: block; font-family: var(--font-display); font-size: var(--fs-md); }
+    .admin-panel span { display: block; color: #FFFFFFB3; font-size: var(--fs-sm); margin-top: var(--sp-1); }
+    .admin-panel .chev { margin-left: auto; color: #FFFFFF66; width: 1.4rem; height: 1.4rem; flex-shrink: 0; }
+
+    @media (max-width: 700px) { .tablet-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="launcher">
+    <div class="launcher-head">
+      <div class="bn-mark">
+        <img class="logo-img" src="assets/img/images-removebg.png" alt="Bandai Namco" />
+        <div class="tagline">Fun for All into the Future</div>
+      </div>
+      <h1>Meeting Room System</h1>
+      <p>Setup picker for IT/facilities — point each kiosk device at its card below</p>
+    </div>
+
+    <section class="launcher-section">
+      <span class="eyebrow">Tablet Displays</span>
+      <p class="section-note">One dedicated, locked-down kiosk per physical room — no navigation to other rooms or the admin console.</p>
+      <div class="tablet-grid" id="tabletGrid"></div>
+    </section>
+
+    <section class="launcher-section">
+      <span class="eyebrow">Staff Only</span>
+      <a class="admin-panel" href="admin/dashboard.html">
+        <div class="ico"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="1.8" fill="#fff" stroke="none"/><circle cx="16" cy="12" r="1.8" fill="#fff" stroke="none"/><circle cx="10" cy="18" r="1.8" fill="#fff" stroke="none"/></svg></div>
+        <span style="flex:1">
+          <strong>Admin Console</strong>
+          <span>Schedules, rooms, users, and reports</span>
+        </span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </section>
+  </main>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/launcher.js"></script>
+</body>
+</html>

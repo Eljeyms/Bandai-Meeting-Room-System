@@ -1,0 +1,62 @@
+/* ============================================================
+   TOKENS — Bandai Namco Meeting Room System
+   Every scale below is derived from the golden ratio φ = 1.618
+   ============================================================ */
+
+:root {
+  /* ---- Golden ratio ---- */
+  --phi: 1.618;
+  --phi-inv: 0.618;          /* 1/φ  → 61.8% */
+  --phi-inv2: 0.382;         /* 1/φ² → 38.2% */
+
+  /* ---- Type scale (base 16px, each step ×1.618) ---- */
+  --fs-xs: 0.618rem;         /* 9.9px  — micro labels */
+  --fs-sm: 0.786rem;         /* 12.6px — captions (base ÷ φ^0.5 approx) */
+  --fs-base: 1rem;           /* 16px   — body */
+  --fs-md: 1.272rem;         /* 20.3px — emphasized body (φ^0.5) */
+  --fs-lg: 1.618rem;         /* 25.9px — section titles */
+  --fs-xl: 2.618rem;         /* 41.9px — page titles (φ²) */
+  --fs-xxl: 4.236rem;        /* 67.8px — hero status word (φ³) */
+  --fs-giant: 6.854rem;      /* 109.7px — tablet status word (φ⁴) */
+
+  /* ---- Spacing scale (base 8px, ×φ per step) ---- */
+  --sp-1: 0.309rem;          /* ~5px */
+  --sp-2: 0.5rem;            /* 8px */
+  --sp-3: 0.809rem;          /* ~13px */
+  --sp-4: 1.309rem;          /* ~21px */
+  --sp-5: 2.118rem;          /* ~34px */
+  --sp-6: 3.427rem;          /* ~55px */
+  --sp-7: 5.545rem;          /* ~89px */
+
+  /* ---- Layout (golden section splits) ---- */
+  --split-major: 61.8%;
+  --split-minor: 38.2%;
+  --sidebar-w: 15.28rem;     /* 38.2% of a 40rem reference column */
+  --radius-sm: 0.618rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.618rem;
+  --radius-xl: 2.618rem;
+
+  /* ---- Bandai Namco palette (kept deliberately small: brand red + one
+     semantic green, everything else is grayscale) ---- */
+  --bn-red: #E60012;         /* official Bandai Namco red — brand + "busy" */
+  --bn-red-dark: #B8000E;    /* hover/pressed */
+  --bn-red-soft: #FBDEE1;    /* single washed tint: badges, borders, focus rings */
+  --ink: #17171B;
+  --ink-soft: #4A4A52;
+  --ink-mute: #8B8B94;
+  --paper: #FFFFFF;
+  --canvas: #F6F5F7;         /* app background */
+  --line: #E8E7EB;
+
+  /* ---- State colors ---- */
+  --state-free: #0E9F5B;     /* the only non-red accent: free/active/good */
+
+  /* ---- Type ---- */
+  --font-display: 'Poppins', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+
+  /* ---- Elevation ---- */
+  --shadow-card: 0 1px 2px rgba(23,23,27,.05), 0 8px 21px rgba(23,23,27,.06);
+  --shadow-panel: 0 13px 34px rgba(230,0,18,.10);
+}

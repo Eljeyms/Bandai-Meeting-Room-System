@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule Management · Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body class="admin" data-page="schedule">
+  <aside class="side" id="sidebar"></aside>
+
+  <main class="content">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">Schedule Management</p>
+        <h1>Meetings</h1>
+        <p>Book, edit, or cancel meetings — double bookings are blocked automatically</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="newMeetingBtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> New meeting</button>
+      </div>
+    </header>
+
+    <div class="filter-row">
+      <select id="roomFilter" aria-label="Filter by room"></select>
+    </div>
+
+    <section class="card block">
+      <table>
+        <thead><tr><th>Meeting</th><th>Room</th><th>Time</th><th>Status</th><th></th></tr></thead>
+        <tbody id="schedRows"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- Meeting modal -->
+  <div class="modal-backdrop" id="meetingModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3 id="meetingModalTitle">New meeting</h3>
+      <div class="field"><label for="mTitle">Title</label><input id="mTitle" placeholder="e.g. Product Review" /></div>
+      <div class="field"><label for="mRoom">Room</label><select id="mRoom"></select></div>
+      <div class="field"><label for="mDate">Date</label><input id="mDate" type="date" /></div>
+      <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3)">
+        <div><label for="mStart">Starts</label><input id="mStart" type="time" /></div>
+        <div><label for="mEnd">Ends</label><input id="mEnd" type="time" /></div>
+      </div>
+      <div class="field"><label for="mHost">Host</label><input id="mHost" placeholder="e.g. A. Tanaka" /></div>
+      <div class="field"><label for="mAtt">Attendees</label><input id="mAtt" type="number" min="1" placeholder="5" /></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('meetingModal')">Cancel</button>
+        <button class="btn btn-primary" id="saveMeeting">Save meeting</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meeting Room 3A · Bandai Namco</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/user.css" />
+</head>
+<body class="tablet">
+
+  <header class="tablet-top">
+    <div class="bn-mark">
+      <img class="logo-img" src="../assets/img/images-removebg.png" alt="Bandai Namco" />
+      <div class="tagline">Fun for All into the Future</div>
+    </div>
+    <div class="room-title">
+      <h1 id="roomName">Meeting Room 3A</h1>
+      <p>Connecting Fun and More</p>
+    </div>
+    <div class="tablet-clock">
+      <div class="date" id="clockDate">—</div>
+      <div class="divider"></div>
+      <div class="time"><span id="clockTime">—</span></div>
+    </div>
+  </header>
+
+  <main class="tablet-main">
+    <!-- 38.2% rail -->
+    <aside class="rail">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Today's Schedule</h2>
+          <a href="../admin/schedule.html">View All</a>
+        </div>
+        <div class="sched-list" id="schedList"></div>
+      </section>
+
+      <section class="panel ongoing" id="ongoingPanel">
+        <div class="panel-head"><h2>Ongoing Meeting</h2></div>
+        <div id="ongoingBody"></div>
+      </section>
+    </aside>
+
+    <!-- 61.8% stage -->
+    <section class="stage busy" id="stage" aria-live="polite">
+      <div class="stage-inner">
+        <div class="status-word" id="statusWord">Occupied</div>
+        <div class="phi-divider" aria-hidden="true"></div>
+        <div class="status-icon" id="statusIcon"></div>
+        <p class="status-sub" id="statusSub">This room is currently in use</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="tablet-foot">
+    <strong>BANDAI NAMCO</strong>
+    <span>Connecting Fun and More</span>
+  </footer>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/user.js"></script>
+</body>
+</html>
