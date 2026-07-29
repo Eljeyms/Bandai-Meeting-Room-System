@@ -48,6 +48,12 @@ type PageKey =
 
 type PortalRole = 'admin' | 'frontdesk'
 
+type NotificationItem = {
+  id: string
+  text: string
+  time: string
+}
+
 const adminLinks = [
   { key: 'dashboard', label: 'Dashboard', icon: HiOutlineTableCells },
   { key: 'reports', label: 'Reports', icon: HiOutlineChartBar },
@@ -88,24 +94,21 @@ const pageHeaders: Record<Exclude<PageKey, 'public'>, { eyebrow: string; title: 
 const pageKeys = new Set<PageKey>([...Object.keys(pageHeaders) as Array<Exclude<PageKey, 'public'>>, 'public'])
 const isPageKey = (value: string): value is PageKey => pageKeys.has(value as PageKey)
 
-type NotificationItem = { id: string; title: string; detail: string; time: string; read: boolean }
-
-const initialNotifications: NotificationItem[] = [
-  { id: 'n1', title: 'Room 4A booking starts in 10 minutes', detail: 'Product Sync with 6 attendees', time: '10m ago', read: false },
-  { id: 'n2', title: 'New HRIS account request', detail: 'Awaiting approval for room-access mapping', time: '1h ago', read: false },
-  { id: 'n3', title: 'Room 2B sensor reconnected', detail: 'Occupancy sensor is back online', time: 'Yesterday', read: true },
-]
-
 function App() {
   const initialHash = window.location.hash.replace('#/', '')
   const [selectedPage, setSelectedPage] = useState<PageKey>(isPageKey(initialHash) ? initialHash : 'dashboard')
   const [currentTime, setCurrentTime] = useState(new Date())
   const [menuOpen, setMenuOpen] = useState(false)
-  const [notifications, setNotifications] = useState(initialNotifications)
+  const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const notificationsRef = useRef<HTMLDivElement>(null)
-  const { data, loading, error, isLive } = useDashboard()
-  const hasUnreadNotifications = notifications.some((item) => !item.read)
+
+  const addNotification = (text: string) => {
+    const time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    setNotifications((prev) => [{ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, text, time }, ...prev].slice(0, 6))
+  }
+
+  const { data, loading, error, isLive } = useDashboard(addNotification)
 
   const publicView = selectedPage === 'public'
   const hidePageHeader = selectedPage === 'display' || selectedPage === 'overview'
@@ -146,7 +149,6 @@ function App() {
 
   const toggleNotifications = () => {
     setNotificationsOpen((open) => !open)
-    setNotifications((items) => items.map((item) => ({ ...item, read: true })))
   }
 
   const navigate = (page: PageKey) => {
@@ -172,8 +174,12 @@ function App() {
       {menuOpen && <button className="nav-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
       <aside className={`side ${menuOpen ? 'is-open' : ''}`}>
         <div className="brand">
-          <div className="chip">
-            <img src="/assets/img/images-removebg.png" alt="Bandai Namco" />
+          <div className="brand-mark">
+            <img src="/assets/img/bandai-badge.png" alt="Bandai" />
+          </div>
+          <div className="brand-copy">
+            <strong>Bandai Namco</strong>
+            <span>Meeting Room System</span>
           </div>
           <button className="close-menu" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><HiXMark /></button>
         </div>
@@ -240,7 +246,7 @@ function App() {
                 <option value="public">Public schedule</option>
               </select>
             </label>
-            <div className="notification-wrap" ref={notificationsRef}>
+            <div className="notification-wrapper" ref={notificationsRef}>
               <button
                 type="button"
                 className="topbar-icon"
@@ -250,26 +256,30 @@ function App() {
                 onClick={toggleNotifications}
               >
                 <HiOutlineBell />
-                {hasUnreadNotifications && <span className="notification-dot" />}
+                {notifications.length > 0 ? <span className="notification-dot" /> : null}
               </button>
-              {notificationsOpen && (
-                <div className="notification-panel" role="menu" aria-label="Notifications">
-                  <div className="notification-panel-head">Notifications</div>
+              {notificationsOpen ? (
+                <div className="notification-menu" role="dialog" aria-label="Notifications">
+                  <div className="notification-menu-head">
+                    <strong>Notifications</strong>
+                    <button type="button" className="notification-menu-clear" onClick={() => setNotifications([])}>
+                      Clear
+                    </button>
+                  </div>
                   {notifications.length === 0 ? (
-                    <p className="notification-empty">You're all caught up.</p>
+                    <div className="notification-empty">No recent updates</div>
                   ) : (
                     <ul>
                       {notifications.map((item) => (
-                        <li key={item.id} className="notification-item" role="menuitem">
-                          <span className="notification-item-title">{item.title}</span>
-                          <span className="notification-item-detail">{item.detail}</span>
-                          <span className="notification-item-time">{item.time}</span>
+                        <li key={item.id}>
+                          <span>{item.text}</span>
+                          <time>{item.time}</time>
                         </li>
                       ))}
                     </ul>
                   )}
                 </div>
-              )}
+              ) : null}
             </div>
             <div className="topbar-user">
               <HiOutlineUserCircle />

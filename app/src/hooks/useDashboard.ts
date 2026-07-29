@@ -5,7 +5,7 @@ import { meetings, rooms, users, utilization } from '../data'
 
 const socketUrl = (import.meta.env.VITE_API_URL as string | undefined) || 'http://127.0.0.1:4000'
 
-export default function useDashboard() {
+export default function useDashboard(onNotification?: (message: string) => void) {
   const [data, setData] = useState<DashboardData>({ rooms, meetings, users, utilization })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -40,9 +40,18 @@ export default function useDashboard() {
     })
     socket.on('disconnect', () => setIsLive(false))
     socket.on('connect_error', () => setIsLive(false))
-    socket.on('rooms:updated', () => load())
-    socket.on('meetings:updated', () => load())
-    socket.on('users:updated', () => load())
+    socket.on('rooms:updated', () => {
+      load()
+      onNotification?.('Room status changed')
+    })
+    socket.on('meetings:updated', () => {
+      load()
+      onNotification?.('Meeting schedule changed')
+    })
+    socket.on('users:updated', () => {
+      load()
+      onNotification?.('User list changed')
+    })
 
     return () => {
       socket.disconnect()
