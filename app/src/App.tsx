@@ -147,6 +147,10 @@ function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [notificationsOpen])
 
+  const toggleNotifications = () => {
+    setNotificationsOpen((open) => !open)
+  }
+
   const navigate = (page: PageKey) => {
     setSelectedPage(page)
     setMenuOpen(false)
@@ -170,13 +174,13 @@ function App() {
       {menuOpen && <button className="nav-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
       <aside className={`side ${menuOpen ? 'is-open' : ''}`}>
         <div className="brand">
-          <div className="chip">
-            <img src="/assets/img/images-removebg.png" alt="Bandai Namco" />
+          <div className="brand-mark">
+            <img src="/assets/img/bandai-badge.png" alt="Bandai" />
           </div>
-          <span className="brand-copy">
-            <strong>Meeting Room</strong>
-            <span>{activeRole === 'admin' ? 'Admin Console' : 'Front Desk'}</span>
-          </span>
+          <div className="brand-copy">
+            <strong>Bandai Namco</strong>
+            <span>Meeting Room System</span>
+          </div>
           <button className="close-menu" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><HiXMark /></button>
         </div>
 
@@ -249,7 +253,7 @@ function App() {
                 aria-label="Notifications"
                 aria-haspopup="true"
                 aria-expanded={notificationsOpen}
-                onClick={() => setNotificationsOpen((prev) => !prev)}
+                onClick={toggleNotifications}
               >
                 <HiOutlineBell />
                 {notifications.length > 0 ? <span className="notification-dot" /> : null}
