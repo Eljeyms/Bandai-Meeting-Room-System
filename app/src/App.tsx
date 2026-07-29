@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   HiArrowPath,
   HiBars3,
@@ -88,12 +88,24 @@ const pageHeaders: Record<Exclude<PageKey, 'public'>, { eyebrow: string; title: 
 const pageKeys = new Set<PageKey>([...Object.keys(pageHeaders) as Array<Exclude<PageKey, 'public'>>, 'public'])
 const isPageKey = (value: string): value is PageKey => pageKeys.has(value as PageKey)
 
+type NotificationItem = { id: string; title: string; detail: string; time: string; read: boolean }
+
+const initialNotifications: NotificationItem[] = [
+  { id: 'n1', title: 'Room 4A booking starts in 10 minutes', detail: 'Product Sync with 6 attendees', time: '10m ago', read: false },
+  { id: 'n2', title: 'New HRIS account request', detail: 'Awaiting approval for room-access mapping', time: '1h ago', read: false },
+  { id: 'n3', title: 'Room 2B sensor reconnected', detail: 'Occupancy sensor is back online', time: 'Yesterday', read: true },
+]
+
 function App() {
   const initialHash = window.location.hash.replace('#/', '')
   const [selectedPage, setSelectedPage] = useState<PageKey>(isPageKey(initialHash) ? initialHash : 'dashboard')
   const [currentTime, setCurrentTime] = useState(new Date())
   const [menuOpen, setMenuOpen] = useState(false)
+  const [notifications, setNotifications] = useState(initialNotifications)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const notificationsRef = useRef<HTMLDivElement>(null)
   const { data, loading, error, isLive } = useDashboard()
+  const hasUnreadNotifications = notifications.some((item) => !item.read)
 
   const publicView = selectedPage === 'public'
   const hidePageHeader = selectedPage === 'display' || selectedPage === 'overview'
@@ -120,6 +132,22 @@ function App() {
       window.removeEventListener('popstate', syncPageFromHash)
     }
   }, [])
+
+  useEffect(() => {
+    if (!notificationsOpen) return
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [notificationsOpen])
+
+  const toggleNotifications = () => {
+    setNotificationsOpen((open) => !open)
+    setNotifications((items) => items.map((item) => ({ ...item, read: true })))
+  }
 
   const navigate = (page: PageKey) => {
     setSelectedPage(page)
@@ -212,10 +240,37 @@ function App() {
                 <option value="public">Public schedule</option>
               </select>
             </label>
-            <button type="button" className="topbar-icon" aria-label="Notifications">
-              <HiOutlineBell />
-              <span className="notification-dot" />
-            </button>
+            <div className="notification-wrap" ref={notificationsRef}>
+              <button
+                type="button"
+                className="topbar-icon"
+                aria-label="Notifications"
+                aria-haspopup="true"
+                aria-expanded={notificationsOpen}
+                onClick={toggleNotifications}
+              >
+                <HiOutlineBell />
+                {hasUnreadNotifications && <span className="notification-dot" />}
+              </button>
+              {notificationsOpen && (
+                <div className="notification-panel" role="menu" aria-label="Notifications">
+                  <div className="notification-panel-head">Notifications</div>
+                  {notifications.length === 0 ? (
+                    <p className="notification-empty">You're all caught up.</p>
+                  ) : (
+                    <ul>
+                      {notifications.map((item) => (
+                        <li key={item.id} className="notification-item" role="menuitem">
+                          <span className="notification-item-title">{item.title}</span>
+                          <span className="notification-item-detail">{item.detail}</span>
+                          <span className="notification-item-time">{item.time}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="topbar-user">
               <HiOutlineUserCircle />
               <span><strong>{activeRole === 'admin' ? 'Administrator' : 'Front Desk'}</strong><small>{activeRole === 'admin' ? 'System Admin' : 'Reception'}</small></span>

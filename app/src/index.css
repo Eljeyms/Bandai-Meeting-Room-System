@@ -537,6 +537,75 @@ button, input, select, textarea {
   background: var(--bn-red);
 }
 
+.notification-wrap {
+  position: relative;
+}
+
+.notification-panel {
+  position: absolute;
+  top: calc(100% + .6rem);
+  right: 0;
+  width: 19rem;
+  max-width: calc(100vw - 2rem);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  z-index: 30;
+}
+
+.notification-panel-head {
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+
+.notification-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item-title {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.notification-item-detail {
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+}
+
+.notification-item-time {
+  font-size: var(--fs-xs);
+  color: var(--ink-mute);
+}
+
+.notification-empty {
+  padding: var(--sp-4);
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  margin: 0;
+}
+
 .topbar-user {
   display: flex;
   align-items: center;
