@@ -526,10 +526,14 @@ button, input, select, textarea {
   height: 1.25rem;
 }
 
+.notification-wrapper {
+  position: relative;
+}
+
 .notification-dot {
   position: absolute;
-  top: .5rem;
-  right: .5rem;
+  top: .35rem;
+  right: .35rem;
   width: .42rem;
   height: .42rem;
   border: 2px solid var(--paper);
@@ -604,6 +608,72 @@ button, input, select, textarea {
   font-size: var(--fs-sm);
   color: var(--ink-soft);
   margin: 0;
+.notification-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.75rem);
+  z-index: 20;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: 22rem;
+  overflow: auto;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  box-shadow: 0 24px 48px rgba(5, 24, 50, 0.18);
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.notification-menu-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.notification-menu-head strong {
+  font-size: var(--fs-sm);
+}
+
+.notification-menu-clear {
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+
+.notification-menu ul {
+  display: grid;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-menu li {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem;
+  border-radius: 0.85rem;
+  background: var(--paper-soft);
+  border: 1px solid rgba(146, 172, 199, 0.1);
+}
+
+.notification-menu li span {
+  font-size: var(--fs-sm);
+}
+
+.notification-menu li time {
+  display: block;
+  font-size: var(--fs-xxs);
+  color: var(--ink-soft);
+}
+
+.notification-empty {
+  padding: 1rem;
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
 }
 
 .topbar-user {

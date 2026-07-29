@@ -48,6 +48,12 @@ type PageKey =
 
 type PortalRole = 'admin' | 'frontdesk'
 
+type NotificationItem = {
+  id: string
+  text: string
+  time: string
+}
+
 const adminLinks = [
   { key: 'dashboard', label: 'Dashboard', icon: HiOutlineTableCells },
   { key: 'reports', label: 'Reports', icon: HiOutlineChartBar },
@@ -106,6 +112,15 @@ function App() {
   const notificationsRef = useRef<HTMLDivElement>(null)
   const { data, loading, error, isLive } = useDashboard()
   const hasUnreadNotifications = notifications.some((item) => !item.read)
+  const [notifications, setNotifications] = useState<NotificationItem[]>([])
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+
+  const addNotification = (text: string) => {
+    const time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    setNotifications((prev) => [{ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, text, time }, ...prev].slice(0, 6))
+  }
+
+  const { data, loading, error, isLive } = useDashboard(addNotification)
 
   const publicView = selectedPage === 'public'
   const hidePageHeader = selectedPage === 'display' || selectedPage === 'overview'
@@ -241,6 +256,7 @@ function App() {
               </select>
             </label>
             <div className="notification-wrap" ref={notificationsRef}>
+            <div className="notification-wrapper">
               <button
                 type="button"
                 className="topbar-icon"
@@ -264,12 +280,34 @@ function App() {
                           <span className="notification-item-title">{item.title}</span>
                           <span className="notification-item-detail">{item.detail}</span>
                           <span className="notification-item-time">{item.time}</span>
+                onClick={() => setNotificationsOpen((prev) => !prev)}
+              >
+                <HiOutlineBell />
+                {notifications.length > 0 ? <span className="notification-dot" /> : null}
+              </button>
+              {notificationsOpen ? (
+                <div className="notification-menu" role="dialog" aria-label="Notifications">
+                  <div className="notification-menu-head">
+                    <strong>Notifications</strong>
+                    <button type="button" className="notification-menu-clear" onClick={() => setNotifications([])}>
+                      Clear
+                    </button>
+                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="notification-empty">No recent updates</div>
+                  ) : (
+                    <ul>
+                      {notifications.map((item) => (
+                        <li key={item.id}>
+                          <span>{item.text}</span>
+                          <time>{item.time}</time>
                         </li>
                       ))}
                     </ul>
                   )}
                 </div>
               )}
+              ) : null}
             </div>
             <div className="topbar-user">
               <HiOutlineUserCircle />
