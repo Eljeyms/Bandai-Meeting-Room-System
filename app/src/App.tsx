@@ -194,7 +194,7 @@ function App() {
         </div>
 
         <nav aria-label="Primary navigation">
-          <div className="section-label">{activeRole === 'admin' ? 'Administration' : 'Front Desk'}</div>
+          <div className="section-label">{activeRole === 'admin' ? 'Manage' : 'Front Desk'}</div>
           {roleLinks.map((link) => (
             <button
               type="button"
@@ -209,7 +209,7 @@ function App() {
 
           {activeRole === 'admin' && (
             <>
-              <div className="section-label">Room Displays</div>
+              <div className="section-label">Displays</div>
               <button type="button" className={selectedPage === 'display' ? 'active' : ''} onClick={() => navigate('display')}>
                 <span className="ico"><HiComputerDesktop /></span>Room Display
               </button>

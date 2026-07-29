@@ -38,6 +38,11 @@
   --canvas: #F6F5F7;
   --line: #E8E7EB;
   --state-free: #0E9F5B;
+  --side-bg: #0C0C12;
+  --side-bg-2: #16161E;
+  --side-text: #EDEDF2;
+  --side-text-mute: #8B8B97;
+  --side-line: rgba(255,255,255,.08);
   --font-display: 'Poppins', 'Segoe UI', sans-serif;
   --font-body: 'Inter', 'Segoe UI', sans-serif;
   --shadow-card: 0 1px 2px rgba(23,23,27,.05), 0 8px 21px rgba(23,23,27,.06);
@@ -188,8 +193,8 @@ button, input, select, textarea {
 }
 
 .side {
-  background: var(--ink);
-  color: #fff;
+  background: var(--side-bg);
+  color: var(--side-text);
   display: flex;
   flex-direction: column;
   padding: 1rem;
@@ -199,8 +204,8 @@ button, input, select, textarea {
   height: 100dvh;
   z-index: 30;
   overflow: hidden;
-  border-right: 1px solid rgba(255,255,255,.08);
-  box-shadow: 8px 0 28px rgba(0,0,0,.24);
+  border-right: 1px solid var(--side-line);
+  box-shadow: 8px 0 28px rgba(0,0,0,.35);
 }
 
 .side .brand {
@@ -211,7 +216,7 @@ button, input, select, textarea {
   padding: 0 var(--sp-1) var(--sp-3);
   margin-bottom: var(--sp-3);
   flex: 0 0 auto;
-  border-bottom: 1px solid rgba(255,255,255,.12);
+  border-bottom: 1px solid var(--side-line);
 }
 
 .brand-mark {
@@ -241,7 +246,7 @@ button, input, select, textarea {
   white-space: nowrap;
   font-size: var(--fs-sm);
   font-weight: 700;
-  color: #fff;
+  color: var(--side-text);
 }
 
 .brand-copy span {
@@ -249,7 +254,7 @@ button, input, select, textarea {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--fs-xs);
-  color: rgba(255,255,255,.55);
+  color: var(--side-text-mute);
 }
 
 .side-profile {
@@ -258,9 +263,9 @@ button, input, select, textarea {
   gap: var(--sp-3);
   padding: var(--sp-3);
   margin-bottom: var(--sp-3);
-  border: 1px solid rgba(255,255,255,.1);
+  border: 1px solid var(--side-line);
   border-radius: var(--radius-md);
-  background: rgba(255,255,255,.06);
+  background: rgba(255,255,255,.04);
 }
 
 .profile-avatar {
@@ -287,10 +292,11 @@ button, input, select, textarea {
   font-size: var(--fs-sm);
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--side-text);
 }
 
 .profile-copy > span {
-  color: color-mix(in srgb, var(--bn-red) 55%, white);
+  color: #ff6b74;
   font-size: var(--fs-xs);
 }
 
@@ -299,8 +305,8 @@ button, input, select, textarea {
   margin-top: .35rem;
   padding: .18rem .45rem;
   border-radius: 999px;
-  background: var(--bn-red-soft);
-  color: var(--bn-red-dark);
+  background: color-mix(in srgb, var(--bn-red) 22%, transparent);
+  color: #ffd0d3;
   font-size: .58rem;
   font-weight: 700;
 }
@@ -323,7 +329,7 @@ button, input, select, textarea {
   font-size: var(--fs-xs);
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: rgba(255,255,255,.45);
+  color: var(--side-text-mute);
   margin: 0 var(--sp-0) var(--sp-2);
   padding-left: var(--sp-1);
 }
@@ -335,7 +341,7 @@ button, input, select, textarea {
   gap: var(--sp-3);
   padding: var(--sp-3);
   border-radius: var(--radius-sm);
-  color: rgba(255,255,255,.72);
+  color: #C6C6D0;
   font-weight: 500;
   font-size: var(--fs-base);
   min-height: 3rem;
@@ -344,7 +350,6 @@ button, input, select, textarea {
   text-overflow: ellipsis;
   width: 100%;
   border: 0;
-  border-left: 3px solid transparent;
   background: transparent;
   text-align: left;
   cursor: pointer;
@@ -352,16 +357,16 @@ button, input, select, textarea {
 
 .side nav a:hover,
 .side nav button:hover {
-  background: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.07);
   color: #fff;
 }
 
 .side nav a.active,
 .side nav button.active {
-  border-left-color: var(--bn-red);
-  background: color-mix(in srgb, var(--bn-red) 18%, black);
+  background: var(--bn-red);
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(230,0,18,.35);
 }
 
 .side nav a .ico,
@@ -463,14 +468,14 @@ button, input, select, textarea {
   margin-top: auto;
   padding-top: var(--sp-4);
   font-size: var(--fs-xs);
-  color: rgba(255,255,255,.45);
+  color: var(--side-text-mute);
   line-height: 1.6;
   flex: 0 0 auto;
-  border-top: 1px solid rgba(255,255,255,.12);
+  border-top: 1px solid var(--side-line);
 }
 
 .side .side-foot a {
-  color: rgba(255,255,255,.72);
+  color: #D6D6DE;
   text-decoration: underline;
 }
 
@@ -1360,17 +1365,30 @@ td .sub {
 
 .calendar-event {
   display: grid;
-  gap: .25rem;
-  padding: .6rem;
-  border-radius: .65rem;
-  background: #fff3f4;
+  gap: .2rem;
+  padding: .55rem .65rem;
+  border-radius: .55rem;
+  border-left: 3px solid var(--bn-red);
+  background: color-mix(in srgb, var(--bn-red) 8%, white);
   color: #9a0010;
   font-size: var(--fs-xs);
+  box-shadow: 0 1px 2px rgba(23,23,27,.04);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.calendar-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(23,23,27,.1);
 }
 
 .calendar-event.upcoming {
-  background: #f0f2f5;
+  border-left-color: var(--ink-mute);
+  background: var(--canvas);
   color: var(--ink-soft);
+}
+
+.calendar-event strong {
+  font-weight: 700;
 }
 
 .calendar-event span {
@@ -1381,11 +1399,25 @@ td .sub {
   opacity: .72;
 }
 
+.week-day-head {
+  transition: background .12s ease;
+}
+
+.week-day:not(.today) .week-day-head:hover {
+  background: color-mix(in srgb, var(--bn-red) 6%, var(--canvas));
+}
+
 .week-open {
-  padding: .6rem .2rem;
+  display: grid;
+  place-items: center;
+  min-height: 2.6rem;
+  margin: .1rem;
+  padding: .6rem .4rem;
+  border: 1px dashed var(--line);
+  border-radius: .55rem;
   color: var(--ink-mute);
   font-size: var(--fs-xs);
-  text-align: center;
+  font-weight: 600;
 }
 
 .month-wrap {
@@ -2663,6 +2695,7 @@ td .sub {
   gap: var(--sp-4);
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 .stage-inner {
@@ -2705,7 +2738,8 @@ td .sub {
 
 .phi-divider {
   position: relative;
-  height: 2px;
+  height: 3px;
+  border-radius: 2px;
   margin: var(--sp-3) auto;
   width: 70%;
 }
@@ -2733,6 +2767,18 @@ td .sub {
 .status-icon {
   font-size: var(--fs-xl);
   line-height: 1;
+}
+
+.stage .status-icon {
+  width: 3.4rem;
+  height: 3.4rem;
+  margin: 0 auto;
+}
+
+.stage .status-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 1.4;
 }
 
 .stage.busy .status-icon {
@@ -3554,7 +3600,8 @@ td .sub {
     border: 0;
     border-radius: .75rem;
     background: rgba(255,255,255,.08);
-    color: #fff;
+    color: var(--side-text);
+    flex-shrink: 0;
   }
 
   .nav-scrim {
