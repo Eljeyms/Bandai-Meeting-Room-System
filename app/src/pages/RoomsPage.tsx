@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import Modal from '../components/Modal'
 import { createRoom, deleteRoom, updateRoom, type DashboardData } from '../lib/api'
 
 export default function RoomsPage({ data }: { data: DashboardData }) {
@@ -7,6 +8,8 @@ export default function RoomsPage({ data }: { data: DashboardData }) {
   const [sortBy, setSortBy] = useState('name')
   const [draft, setDraft] = useState({ name: '', floor: '', capacity: 6, status: 'available' as 'available' | 'occupied', sensor: 'AiSense X', tablet: 'Kiosk' })
   const [message, setMessage] = useState('')
+  const [showRoomModal, setShowRoomModal] = useState(false)
+  const [roomToDelete, setRoomToDelete] = useState<DashboardData['rooms'][number] | null>(null)
 
   const filteredRooms = useMemo(() => {
     return rooms
@@ -22,19 +25,9 @@ export default function RoomsPage({ data }: { data: DashboardData }) {
     <div className="card block">
       <div className="block-head">
         <h2>Room Configuration</h2>
-        <button className="btn btn-primary" onClick={() => setMessage('Room editing is active and writes through the backend API.')}>Add room</button>
+        <button className="btn btn-primary" onClick={() => setShowRoomModal(true)}>Add room</button>
       </div>
       {message ? <div className="badge badge-free" style={{ marginBottom: '1rem' }}>{message}</div> : null}
-      <div className="filter-row">
-        <input placeholder="Room name" value={draft.name} onChange={(event) => setDraft((prev) => ({ ...prev, name: event.target.value }))} />
-        <input placeholder="Floor" value={draft.floor} onChange={(event) => setDraft((prev) => ({ ...prev, floor: event.target.value }))} />
-        <input type="number" placeholder="Capacity" value={draft.capacity} onChange={(event) => setDraft((prev) => ({ ...prev, capacity: Number(event.target.value) }))} />
-        <select value={draft.status} onChange={(event) => setDraft((prev) => ({ ...prev, status: event.target.value as 'available' | 'occupied' }))}>
-          <option value="available">Available</option>
-          <option value="occupied">Occupied</option>
-        </select>
-        <button className="btn btn-primary" onClick={async () => { if (!draft.name || !draft.floor) { setMessage('Please provide a room name and floor.'); return; } await createRoom(draft); setDraft({ name: '', floor: '', capacity: 6, status: 'available', sensor: 'AiSense X', tablet: 'Kiosk' }); setMessage('Room created successfully.'); }}>Save</button>
-      </div>
       <div className="filter-row">
         <select value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}>
           <option value="">All statuses</option>
@@ -67,7 +60,7 @@ export default function RoomsPage({ data }: { data: DashboardData }) {
               <td><span className={`dot ${room.status === 'occupied' ? 'dot-busy' : 'dot-free'}`}></span>{room.status}</td>
               <td className="row-actions">
                 <button className="icon-btn" title="Edit" onClick={async () => { await updateRoom(room.id, { status: room.status === 'occupied' ? 'available' : 'occupied' }); setMessage('Room status updated.'); }}>✎</button>
-                <button className="icon-btn" title="Remove" onClick={async () => { await deleteRoom(room.id); setMessage('Room removed.'); }}>✕</button>
+                <button className="icon-btn" title="Remove" onClick={() => setRoomToDelete(room)}>✕</button>
               </td>
             </tr>
           ))}
@@ -78,6 +71,45 @@ export default function RoomsPage({ data }: { data: DashboardData }) {
           )}
         </tbody>
       </table>
+      <Modal
+        open={showRoomModal}
+        title="Add room"
+        onClose={() => setShowRoomModal(false)}
+        actions={<>
+          <button type="button" className="btn" onClick={() => setShowRoomModal(false)}>Cancel</button>
+          <button className="btn btn-primary" onClick={async () => {
+            if (!draft.name || !draft.floor) { setMessage('Please provide a room name and floor.'); return }
+            await createRoom(draft)
+            setDraft({ name: '', floor: '', capacity: 6, status: 'available', sensor: 'AiSense X', tablet: 'Kiosk' })
+            setMessage('Room created successfully.')
+            setShowRoomModal(false)
+          }}>Save room</button>
+        </>}
+      >
+        <div className="modal-form">
+          <label><span>Room name</span><input autoFocus value={draft.name} onChange={(event) => setDraft((prev) => ({ ...prev, name: event.target.value }))} /></label>
+          <label><span>Floor</span><input value={draft.floor} onChange={(event) => setDraft((prev) => ({ ...prev, floor: event.target.value }))} /></label>
+          <label><span>Capacity</span><input type="number" min="1" value={draft.capacity} onChange={(event) => setDraft((prev) => ({ ...prev, capacity: Number(event.target.value) }))} /></label>
+          <label><span>Status</span><select value={draft.status} onChange={(event) => setDraft((prev) => ({ ...prev, status: event.target.value as 'available' | 'occupied' }))}><option value="available">Available</option><option value="occupied">Occupied</option></select></label>
+        </div>
+      </Modal>
+      <Modal
+        open={Boolean(roomToDelete)}
+        title="Remove room?"
+        size="small"
+        onClose={() => setRoomToDelete(null)}
+        actions={<>
+          <button type="button" className="btn" onClick={() => setRoomToDelete(null)}>Keep room</button>
+          <button className="btn btn-danger" onClick={async () => {
+            if (!roomToDelete) return
+            await deleteRoom(roomToDelete.id)
+            setMessage('Room removed.')
+            setRoomToDelete(null)
+          }}>Remove room</button>
+        </>}
+      >
+        <p>This will permanently remove <strong>{roomToDelete?.name}</strong> from the room list.</p>
+      </Modal>
     </div>
   )
 }

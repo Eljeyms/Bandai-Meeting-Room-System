@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { HiChevronLeft, HiChevronRight, HiOutlineCalendarDays, HiOutlineClock } from 'react-icons/hi2'
+import Modal from '../components/Modal'
 import { createMeeting, deleteMeeting, updateMeeting, type DashboardData, type Meeting } from '../lib/api'
+import { workflowTemplates as defaultWorkflowTemplates, type WorkflowTemplate } from '../workflowTemplates'
 
 type CalendarView = 'day' | 'week' | 'month'
 
@@ -26,6 +28,24 @@ const addDays = (date: Date, days: number) => new Date(date.getFullYear(), date.
 const startOfWeek = (date: Date) => addDays(date, -((date.getDay() + 6) % 7))
 const isSameDay = (left: Date, right: Date) => toDateKey(left) === toDateKey(right)
 const formatDay = (date: Date) => new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(date)
+const addMinutesToTime = (time: string, minutes: number) => {
+  if (!time) return ''
+  const [hours, currentMinutes] = time.split(':').map(Number)
+  const total = hours * 60 + currentMinutes + minutes
+  return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+}
+const formatTimeOption = (time: string) => {
+  const [hours, minutes] = time.split(':').map(Number)
+  const period = hours >= 12 ? 'PM' : 'AM'
+  const hour = hours % 12 || 12
+  return `${hour}:${String(minutes).padStart(2, '0')} ${period}`
+}
+const timeOptions = Array.from({ length: 96 }, (_, index) => {
+  const hours = Math.floor(index / 4)
+  const minutes = (index % 4) * 15
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+})
+const templateStorageKey = 'bandai-workflow-templates'
 
 function MeetingPill({ meeting, roomName }: { meeting: Meeting; roomName?: string }) {
   return (
@@ -44,8 +64,56 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
   const [selectedRoom, setSelectedRoom] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('')
   const [showForm, setShowForm] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState('')
   const [draft, setDraft] = useState({ title: '', roomId: '', start: '', end: '', host: '', date: toDateKey(initialDate) })
   const [message, setMessage] = useState('')
+  const [meetingToDelete, setMeetingToDelete] = useState<Meeting | null>(null)
+  const [templates, setTemplates] = useState<WorkflowTemplate[]>(() => {
+    try {
+      const saved = localStorage.getItem(templateStorageKey)
+      return saved ? JSON.parse(saved) : defaultWorkflowTemplates
+    } catch {
+      return defaultWorkflowTemplates
+    }
+  })
+  const [showTemplateManager, setShowTemplateManager] = useState(false)
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null)
+  const [templateDraft, setTemplateDraft] = useState({ name: '', description: '', durationMinutes: 30, bufferMinutes: 0 })
+
+  useEffect(() => {
+    localStorage.setItem(templateStorageKey, JSON.stringify(templates))
+  }, [templates])
+
+  const beginNewTemplate = () => {
+    setEditingTemplateId(null)
+    setTemplateDraft({ name: '', description: '', durationMinutes: 30, bufferMinutes: 0 })
+  }
+
+  const beginEditTemplate = (template: WorkflowTemplate) => {
+    setEditingTemplateId(template.id)
+    setTemplateDraft({
+      name: template.name,
+      description: template.description,
+      durationMinutes: template.durationMinutes,
+      bufferMinutes: template.bufferMinutes,
+    })
+  }
+
+  const saveTemplate = () => {
+    if (!templateDraft.name.trim() || templateDraft.durationMinutes < 15) return
+    if (editingTemplateId) {
+      setTemplates((current) => current.map((template) => (
+        template.id === editingTemplateId ? { ...template, ...templateDraft, name: templateDraft.name.trim() } : template
+      )))
+    } else {
+      setTemplates((current) => [...current, {
+        id: `template-${Date.now()}`,
+        ...templateDraft,
+        name: templateDraft.name.trim(),
+      }])
+    }
+    beginNewTemplate()
+  }
 
   const filteredMeetings = useMemo(
     () => meetings
@@ -97,6 +165,7 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
     try {
       await createMeeting({ ...draft, status: 'upcoming' })
       setDraft({ title: '', roomId: '', start: '', end: '', host: '', date: toDateKey(cursorDate) })
+      setSelectedTemplate('')
       setMessage('Meeting created successfully.')
       setShowForm(false)
     } catch {
@@ -197,17 +266,56 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
     </div>
   )
 
-  const meetingForm = showForm ? (
-    <div className="meeting-form">
+  const meetingForm = (
+    <Modal open={showForm} title="New meeting" size="large" onClose={() => setShowForm(false)} actions={<>
+      <button type="button" className="btn" onClick={() => setShowForm(false)}>Cancel</button>
+      <button className="btn btn-primary" type="button" onClick={saveMeeting}>Save meeting</button>
+    </>}>
+    <div className="meeting-form modal-form">
+      <label className="template-field">
+        <span>Workflow template</span>
+        <select
+          autoFocus
+          value={selectedTemplate}
+          onChange={(event) => {
+            const templateId = event.target.value
+            const template = templates.find((item) => item.id === templateId)
+            setSelectedTemplate(templateId)
+            if (template) {
+              setDraft((prev) => ({
+                ...prev,
+                title: prev.title || template.name,
+                end: prev.start ? addMinutesToTime(prev.start, template.durationMinutes) : prev.end,
+              }))
+            }
+          }}
+        >
+          <option value="">No template — custom meeting</option>
+          {templates.map((template) => (
+            <option key={template.id} value={template.id}>
+              {template.name} · {template.durationMinutes} min
+            </option>
+          ))}
+        </select>
+        {selectedTemplate ? (() => {
+          const template = templates.find((item) => item.id === selectedTemplate)
+          return template ? <small className="template-help">{template.description} · {template.bufferMinutes ? `${template.bufferMinutes}-minute room preparation` : 'No preparation buffer'}</small> : null
+        })() : null}
+        <button type="button" className="template-manage-btn" onClick={() => setShowTemplateManager(true)}>Manage templates</button>
+      </label>
       <label><span>Meeting title</span><input value={draft.title} onChange={(event) => setDraft((prev) => ({ ...prev, title: event.target.value }))} placeholder="e.g. Design review" /></label>
       <label><span>Room</span><select value={draft.roomId} onChange={(event) => setDraft((prev) => ({ ...prev, roomId: event.target.value }))}><option value="">Select room</option>{rooms.map((room) => <option key={room.id} value={room.id}>{room.name}</option>)}</select></label>
       <label><span>Date</span><input type="date" value={draft.date} onChange={(event) => setDraft((prev) => ({ ...prev, date: event.target.value }))} /></label>
-      <label><span>Starts</span><input type="time" value={draft.start} onChange={(event) => setDraft((prev) => ({ ...prev, start: event.target.value }))} /></label>
-      <label><span>Ends</span><input type="time" value={draft.end} onChange={(event) => setDraft((prev) => ({ ...prev, end: event.target.value }))} /></label>
+      <label><span>Starts</span><select value={draft.start} onChange={(event) => {
+        const start = event.target.value
+        const template = templates.find((item) => item.id === selectedTemplate)
+        setDraft((prev) => ({ ...prev, start, end: template ? addMinutesToTime(start, template.durationMinutes) : prev.end }))
+      }}><option value="">Select time</option>{timeOptions.map((time) => <option key={time} value={time}>{formatTimeOption(time)}</option>)}</select></label>
+      <label><span>Ends</span><select value={draft.end} onChange={(event) => setDraft((prev) => ({ ...prev, end: event.target.value }))}><option value="">Select time</option>{timeOptions.map((time) => <option key={time} value={time}>{formatTimeOption(time)}</option>)}</select></label>
       <label><span>Host</span><input value={draft.host} onChange={(event) => setDraft((prev) => ({ ...prev, host: event.target.value }))} placeholder="Organizer name" /></label>
-      <button className="btn btn-primary form-submit" type="button" onClick={saveMeeting}>Save meeting</button>
     </div>
-  ) : null
+    </Modal>
+  )
 
   return (
     <div className="schedule-stack" data-view={mode}>
@@ -228,7 +336,7 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
               <button type="button" className="today-btn" onClick={() => setCursorDate(new Date())}>Today</button>
               <button type="button" className="icon-btn" aria-label="Next period" onClick={() => moveCalendar(1)}><HiChevronRight /></button>
             </div>
-            <button className="btn btn-primary" type="button" onClick={() => setShowForm((value) => !value)}>{showForm ? 'Close form' : 'New meeting'}</button>
+            <button className="btn btn-primary" type="button" onClick={() => setShowForm(true)}>New meeting</button>
           </div>
         </div>
 
@@ -248,7 +356,7 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
           <div><p className="eyebrow">All bookings</p><h2>Meeting schedule</h2></div>
           <div className="schedule-head-actions">
             <span className="badge badge-mute">Sorted by date & time</span>
-            <button className="btn btn-primary" type="button" onClick={() => setShowForm((value) => !value)}>{showForm ? 'Close form' : 'New meeting'}</button>
+            <button className="btn btn-primary" type="button" onClick={() => setShowForm(true)}>New meeting</button>
           </div>
         </div>
         {calendarFilters}
@@ -268,7 +376,7 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
                     <td><span className={`badge ${meeting.status === 'ongoing' ? 'badge-busy' : 'badge-mute'}`}>{meeting.status}</span></td>
                     <td className="row-actions">
                       <button className="icon-btn" title="Toggle meeting status" onClick={async () => { await updateMeeting(meeting.id, { status: meeting.status === 'ongoing' ? 'upcoming' : 'ongoing' }); setMessage('Meeting updated.') }}>✎</button>
-                      <button className="icon-btn" title="Cancel meeting" onClick={async () => { await deleteMeeting(meeting.id); setMessage('Meeting cancelled.') }}>✕</button>
+                      <button className="icon-btn" title="Cancel meeting" onClick={() => setMeetingToDelete(meeting)}>✕</button>
                     </td>
                   </tr>
                 )
@@ -278,6 +386,61 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
           </table>
         </div>
       </section>}
+      <Modal
+        open={Boolean(meetingToDelete)}
+        title="Cancel meeting?"
+        size="small"
+        onClose={() => setMeetingToDelete(null)}
+        actions={<>
+          <button type="button" className="btn" onClick={() => setMeetingToDelete(null)}>Keep meeting</button>
+          <button className="btn btn-danger" onClick={async () => {
+            if (!meetingToDelete) return
+            await deleteMeeting(meetingToDelete.id)
+            setMessage('Meeting cancelled.')
+            setMeetingToDelete(null)
+          }}>Cancel meeting</button>
+        </>}
+      >
+        <p><strong>{meetingToDelete?.title}</strong> will be removed from the schedule.</p>
+      </Modal>
+      <Modal
+        open={showTemplateManager}
+        title="Manage workflow templates"
+        size="large"
+        onClose={() => setShowTemplateManager(false)}
+        actions={<button type="button" className="btn" onClick={() => setShowTemplateManager(false)}>Done</button>}
+      >
+        <div className="template-manager">
+          <div className="template-editor">
+            <h3>{editingTemplateId ? 'Edit template' : 'Add template'}</h3>
+            <div className="modal-form">
+              <label><span>Template name</span><input value={templateDraft.name} onChange={(event) => setTemplateDraft((prev) => ({ ...prev, name: event.target.value }))} placeholder="e.g. Interview" /></label>
+              <label><span>Description</span><input value={templateDraft.description} onChange={(event) => setTemplateDraft((prev) => ({ ...prev, description: event.target.value }))} placeholder="Short purpose or setup note" /></label>
+              <label><span>Duration</span><select value={templateDraft.durationMinutes} onChange={(event) => setTemplateDraft((prev) => ({ ...prev, durationMinutes: Number(event.target.value) }))}>{[15, 30, 45, 60, 90, 120, 180].map((minutes) => <option key={minutes} value={minutes}>{minutes} minutes</option>)}</select></label>
+              <label><span>Preparation buffer</span><select value={templateDraft.bufferMinutes} onChange={(event) => setTemplateDraft((prev) => ({ ...prev, bufferMinutes: Number(event.target.value) }))}>{[0, 5, 10, 15, 30].map((minutes) => <option key={minutes} value={minutes}>{minutes ? `${minutes} minutes` : 'No buffer'}</option>)}</select></label>
+            </div>
+            <div className="template-editor-actions">
+              {editingTemplateId ? <button type="button" className="btn" onClick={beginNewTemplate}>Cancel edit</button> : null}
+              <button type="button" className="btn btn-primary" disabled={!templateDraft.name.trim()} onClick={saveTemplate}>{editingTemplateId ? 'Save changes' : 'Add template'}</button>
+            </div>
+          </div>
+          <div className="template-manager-list">
+            {templates.map((template) => (
+              <article key={template.id}>
+                <div><strong>{template.name}</strong><span>{template.durationMinutes} min · {template.bufferMinutes ? `${template.bufferMinutes} min buffer` : 'No buffer'}</span></div>
+                <div className="row-actions">
+                  <button type="button" className="btn" onClick={() => beginEditTemplate(template)}>Edit</button>
+                  <button type="button" className="btn template-delete" onClick={() => {
+                    setTemplates((current) => current.filter((item) => item.id !== template.id))
+                    if (selectedTemplate === template.id) setSelectedTemplate('')
+                    if (editingTemplateId === template.id) beginNewTemplate()
+                  }}>Remove</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
