@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import Modal from '../components/Modal'
 import { createUser, updateUser, type DashboardData } from '../lib/api'
 
 export default function UsersPage({ data }: { data: DashboardData }) {
@@ -8,6 +9,7 @@ export default function UsersPage({ data }: { data: DashboardData }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [draft, setDraft] = useState({ name: '', email: '', dept: '', role: 'Member' as 'Admin' | 'Member', active: true })
   const [message, setMessage] = useState('')
+  const [showUserModal, setShowUserModal] = useState(false)
 
   const filteredUsers = useMemo(
     () => users.filter((user) => {
@@ -23,19 +25,9 @@ export default function UsersPage({ data }: { data: DashboardData }) {
     <div className="card block">
       <div className="block-head">
         <h2>User Management</h2>
-        <button className="btn btn-primary" onClick={() => setMessage('User management actions are active.')}>Add user</button>
+        <button className="btn btn-primary" onClick={() => setShowUserModal(true)}>Add user</button>
       </div>
       {message ? <div className="badge badge-free" style={{ marginBottom: '1rem' }}>{message}</div> : null}
-      <div className="filter-row">
-        <input placeholder="Name" value={draft.name} onChange={(event) => setDraft((prev) => ({ ...prev, name: event.target.value }))} />
-        <input placeholder="Email" value={draft.email} onChange={(event) => setDraft((prev) => ({ ...prev, email: event.target.value }))} />
-        <input placeholder="Department" value={draft.dept} onChange={(event) => setDraft((prev) => ({ ...prev, dept: event.target.value }))} />
-        <select value={draft.role} onChange={(event) => setDraft((prev) => ({ ...prev, role: event.target.value as 'Admin' | 'Member' }))}>
-          <option value="Member">Member</option>
-          <option value="Admin">Admin</option>
-        </select>
-        <button className="btn btn-primary" onClick={async () => { if (!draft.name || !draft.email || !draft.dept) { setMessage('Please provide a full user profile.'); return; } await createUser(draft); setDraft({ name: '', email: '', dept: '', role: 'Member', active: true }); setMessage('User created successfully.'); }}>Save</button>
-      </div>
       <div className="filter-row">
         <select value={selectedRole} onChange={(event) => setSelectedRole(event.target.value)}>
           <option value="">All roles</option>
@@ -86,6 +78,28 @@ export default function UsersPage({ data }: { data: DashboardData }) {
           )}
         </tbody>
       </table>
+      <Modal
+        open={showUserModal}
+        title="Add user"
+        onClose={() => setShowUserModal(false)}
+        actions={<>
+          <button type="button" className="btn" onClick={() => setShowUserModal(false)}>Cancel</button>
+          <button className="btn btn-primary" onClick={async () => {
+            if (!draft.name || !draft.email || !draft.dept) { setMessage('Please provide a full user profile.'); return }
+            await createUser(draft)
+            setDraft({ name: '', email: '', dept: '', role: 'Member', active: true })
+            setMessage('User created successfully.')
+            setShowUserModal(false)
+          }}>Save user</button>
+        </>}
+      >
+        <div className="modal-form">
+          <label><span>Name</span><input autoFocus value={draft.name} onChange={(event) => setDraft((prev) => ({ ...prev, name: event.target.value }))} /></label>
+          <label><span>Email</span><input type="email" value={draft.email} onChange={(event) => setDraft((prev) => ({ ...prev, email: event.target.value }))} /></label>
+          <label><span>Department</span><input value={draft.dept} onChange={(event) => setDraft((prev) => ({ ...prev, dept: event.target.value }))} /></label>
+          <label><span>Role</span><select value={draft.role} onChange={(event) => setDraft((prev) => ({ ...prev, role: event.target.value as 'Admin' | 'Member' }))}><option value="Member">Member</option><option value="Admin">Admin</option></select></label>
+        </div>
+      </Modal>
     </div>
   )
 }
