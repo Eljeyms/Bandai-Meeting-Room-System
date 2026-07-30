@@ -38,11 +38,11 @@
   --canvas: #F6F5F7;
   --line: #E8E7EB;
   --state-free: #0E9F5B;
-  --side-bg: #0C0C12;
-  --side-bg-2: #16161E;
-  --side-text: #EDEDF2;
-  --side-text-mute: #8B8B97;
-  --side-line: rgba(255,255,255,.08);
+  --side-bg: #FFFFFF;
+  --side-bg-2: #F6F5F7;
+  --side-text: #17171B;
+  --side-text-mute: #6B6B76;
+  --side-line: #E8E7EB;
   --font-display: 'Poppins', 'Segoe UI', sans-serif;
   --font-body: 'Inter', 'Segoe UI', sans-serif;
   --shadow-card: 0 1px 2px rgba(23,23,27,.05), 0 8px 21px rgba(23,23,27,.06);
@@ -265,7 +265,7 @@ button, input, select, textarea {
   margin-bottom: var(--sp-3);
   border: 1px solid var(--side-line);
   border-radius: var(--radius-md);
-  background: rgba(255,255,255,.04);
+  background: var(--side-bg-2);
 }
 
 .profile-avatar {
@@ -296,7 +296,7 @@ button, input, select, textarea {
 }
 
 .profile-copy > span {
-  color: #ff6b74;
+  color: var(--bn-red-dark);
   font-size: var(--fs-xs);
 }
 
@@ -306,7 +306,7 @@ button, input, select, textarea {
   padding: .18rem .45rem;
   border-radius: 999px;
   background: color-mix(in srgb, var(--bn-red) 22%, transparent);
-  color: #ffd0d3;
+  color: var(--bn-red-dark);
   font-size: .58rem;
   font-weight: 700;
 }
@@ -321,7 +321,7 @@ button, input, select, textarea {
   overflow-x: hidden;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: #FFFFFF2E transparent;
+  scrollbar-color: #0000002E transparent;
   padding-right: .2rem;
 }
 
@@ -341,7 +341,7 @@ button, input, select, textarea {
   gap: var(--sp-3);
   padding: var(--sp-3);
   border-radius: var(--radius-sm);
-  color: #C6C6D0;
+  color: var(--side-text-mute);
   font-weight: 500;
   font-size: var(--fs-base);
   min-height: 3rem;
@@ -357,8 +357,8 @@ button, input, select, textarea {
 
 .side nav a:hover,
 .side nav button:hover {
-  background: rgba(255,255,255,.07);
-  color: #fff;
+  background: var(--side-bg-2);
+  color: var(--side-text);
 }
 
 .side nav a.active,
@@ -475,7 +475,7 @@ button, input, select, textarea {
 }
 
 .side .side-foot a {
-  color: #D6D6DE;
+  color: var(--side-text);
   text-decoration: underline;
 }
 
@@ -3614,7 +3614,7 @@ td .sub {
     height: 2.5rem;
     border: 0;
     border-radius: .75rem;
-    background: rgba(255,255,255,.08);
+    background: var(--side-bg-2);
     color: var(--side-text);
     flex-shrink: 0;
   }
