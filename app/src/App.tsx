@@ -285,7 +285,7 @@ function App() {
         </header>
       )}
 
-      <main className={`content ${hidePageHeader ? 'display-content' : 'admin-content'}`}>
+      <main className={`content ${hidePageHeader ? 'display-content' : 'admin-content'} ${selectedPage === 'calendar' || selectedPage === 'frontdesk-calendar' ? 'calendar-content' : ''}`}>
         {!hidePageHeader && (
           <header className="page-head">
             <div>

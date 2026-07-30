@@ -799,15 +799,17 @@ button, input, select, textarea {
 }
 
 .quick-action-buttons {
-  display: flex;
-  gap: var(--sp-2);
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
 }
 
 .quick-action {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--sp-2);
+  width: 100%;
   min-height: 2.75rem;
   padding: .65rem .9rem;
   border: 1px solid var(--line);
@@ -940,6 +942,19 @@ button, input, select, textarea {
   grid-template-columns: var(--split-major) calc(var(--split-minor) - var(--sp-4));
   gap: var(--sp-4);
   align-items: start;
+  margin-bottom: var(--sp-4);
+}
+
+@media (max-width: 1080px) {
+  .quick-action-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .quick-action-buttons {
+    grid-template-columns: 1fr;
+  }
 }
 
 .block {
@@ -4099,6 +4114,85 @@ td .sub {
 
 .modal-large {
   max-height: calc(100vh - 2rem);
+}
+
+@media (min-width: 1101px) and (min-height: 700px) {
+  .content.calendar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 1rem;
+  }
+
+  .calendar-content .page-head {
+    flex: 0 0 auto;
+    margin-bottom: 0.8rem;
+  }
+
+  .calendar-content .page-head h1 {
+    font-size: 2rem;
+  }
+
+  .calendar-content .schedule-stack {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .calendar-content .calendar-card {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+    padding: 0.9rem;
+  }
+
+  .calendar-content .calendar-toolbar {
+    padding-bottom: 0.7rem;
+  }
+
+  .calendar-content .calendar-toolbar h2 {
+    font-size: 1.25rem;
+  }
+
+  .calendar-content .calendar-filters {
+    padding: 0.55rem 0;
+  }
+
+  .calendar-content .calendar-canvas,
+  .calendar-content .day-view,
+  .calendar-content .week-view,
+  .calendar-content .month-wrap {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .calendar-content .day-agenda,
+  .calendar-content .week-events {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .calendar-content .month-wrap {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .calendar-content .month-view {
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    min-height: 0;
+  }
+
+  .calendar-content .month-day {
+    min-height: 0;
+    overflow: hidden;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .calendar-content .month-weekdays span {
+    padding: 0.45rem;
+  }
 }
 
 .modal-header,
