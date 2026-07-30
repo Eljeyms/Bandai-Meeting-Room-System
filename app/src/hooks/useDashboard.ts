@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { getDashboard, type DashboardData } from '../lib/api'
 import { meetings, rooms, users, utilization } from '../data'
+import { workflowTemplates } from '../workflowTemplates'
 
 const socketUrl = (import.meta.env.VITE_API_URL as string | undefined) || 'http://127.0.0.1:4000'
 
 export default function useDashboard(onNotification?: (message: string) => void) {
-  const [data, setData] = useState<DashboardData>({ rooms, meetings, users, utilization })
+  const [data, setData] = useState<DashboardData>({ rooms, meetings, users, utilization, workflowTemplates })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isLive, setIsLive] = useState(false)
@@ -51,6 +52,10 @@ export default function useDashboard(onNotification?: (message: string) => void)
     socket.on('users:updated', () => {
       load()
       onNotification?.('User list changed')
+    })
+    socket.on('templates:updated', () => {
+      load()
+      onNotification?.('Workflow templates changed')
     })
 
     return () => {

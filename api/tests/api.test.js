@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import supertest from 'supertest';
 import mongoose from 'mongoose';
-import { app, Room, seedData, connectDb, memoryServer } from '../server.js';
+import { app, Room, Meeting, WorkflowTemplate, seedData, connectDb, memoryServer } from '../server.js';
 
 const request = supertest(app);
 
@@ -31,6 +31,7 @@ test('dashboard endpoint returns seeded data', async () => {
   assert.equal(Array.isArray(response.body.meetings), true);
   assert.equal(Array.isArray(response.body.users), true);
   assert.equal(Array.isArray(response.body.utilization), true);
+  assert.equal(Array.isArray(response.body.workflowTemplates), true);
 });
 
 test('seed data includes sample meeting rooms 1-4', async () => {
@@ -100,4 +101,65 @@ test('smart room controls support manual and automatic modes', async () => {
     },
     { mode: 'automatic', lights: true, aircon: true, fan: false }
   );
+});
+
+test('workflow templates can be created, updated, and removed', async () => {
+  const createResponse = await request.post('/api/workflow-templates').send({
+    name: 'Recruitment Interview',
+    description: 'Interview room setup',
+    durationMinutes: 45,
+    bufferMinutes: 10,
+  });
+  assert.equal(createResponse.status, 201);
+  assert.equal(createResponse.body.durationMinutes, 45);
+
+  const updateResponse = await request.put(`/api/workflow-templates/${createResponse.body._id}`).send({
+    name: 'Recruitment Interview',
+    description: 'Panel interview room setup',
+    durationMinutes: 60,
+    bufferMinutes: 15,
+  });
+  assert.equal(updateResponse.status, 200);
+  assert.equal(updateResponse.body.durationMinutes, 60);
+
+  const deleteResponse = await request.delete(`/api/workflow-templates/${createResponse.body._id}`);
+  assert.equal(deleteResponse.status, 200);
+  assert.equal(await WorkflowTemplate.exists({ _id: createResponse.body._id }), null);
+});
+
+test('meeting creation rejects overlapping bookings for the same room', async () => {
+  const room = await Room.findOne({ name: 'Meeting Room 1' });
+  assert.ok(room);
+  await Meeting.create({
+    title: 'Existing booking',
+    roomId: room._id,
+    status: 'upcoming',
+    start: '10:00',
+    end: '11:00',
+    host: 'Test Host',
+    date: '2030-01-15',
+  });
+
+  const conflictResponse = await request.post('/api/meetings').send({
+    title: 'Overlapping booking',
+    roomId: room._id.toString(),
+    status: 'upcoming',
+    start: '10:30',
+    end: '11:30',
+    host: 'Another Host',
+    date: '2030-01-15',
+  });
+  assert.equal(conflictResponse.status, 409);
+  assert.match(conflictResponse.body.error, /already booked/i);
+
+  const adjacentResponse = await request.post('/api/meetings').send({
+    title: 'Adjacent booking',
+    roomId: room._id.toString(),
+    status: 'upcoming',
+    start: '11:00',
+    end: '11:30',
+    host: 'Another Host',
+    date: '2030-01-15',
+  });
+  assert.equal(adjacentResponse.status, 201);
 });

@@ -23,6 +23,8 @@ From this folder:
 
 ```powershell
 npm run install:all
+Copy-Item api/.env.example api/.env
+docker-compose up -d mongodb
 npm run dev:api
 ```
 
@@ -33,6 +35,9 @@ npm run dev:app
 ```
 
 The web application uses Vite. The API runs on `http://127.0.0.1:4000`.
+
+MongoDB runs in Docker with a persistent named volume. If Docker is unavailable,
+the API automatically uses a temporary in-memory MongoDB instance instead.
 
 ## Common commands
 

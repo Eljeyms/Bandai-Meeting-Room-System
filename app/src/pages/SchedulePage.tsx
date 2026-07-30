@@ -1,8 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { HiChevronLeft, HiChevronRight, HiOutlineCalendarDays, HiOutlineClock } from 'react-icons/hi2'
 import Modal from '../components/Modal'
-import { createMeeting, deleteMeeting, updateMeeting, type DashboardData, type Meeting } from '../lib/api'
-import { workflowTemplates as defaultWorkflowTemplates, type WorkflowTemplate } from '../workflowTemplates'
+import {
+  createMeeting,
+  createWorkflowTemplate,
+  deleteMeeting,
+  deleteWorkflowTemplate,
+  updateMeeting,
+  updateWorkflowTemplate,
+  type DashboardData,
+  type Meeting,
+} from '../lib/api'
+import type { WorkflowTemplate } from '../workflowTemplates'
 
 type CalendarView = 'day' | 'week' | 'month'
 
@@ -45,7 +54,9 @@ const timeOptions = Array.from({ length: 96 }, (_, index) => {
   const minutes = (index % 4) * 15
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 })
-const templateStorageKey = 'bandai-workflow-templates'
+const meetingOverlaps = (meeting: Meeting, roomId: string, date: string, start: string, end: string) => (
+  meeting.roomId === roomId && meeting.date === date && meeting.start < end && meeting.end > start
+)
 
 function MeetingPill({ meeting, roomName }: { meeting: Meeting; roomName?: string }) {
   return (
@@ -57,7 +68,7 @@ function MeetingPill({ meeting, roomName }: { meeting: Meeting; roomName?: strin
 }
 
 export default function SchedulePage({ data, mode = 'calendar' }: { data: DashboardData; mode?: 'calendar' | 'schedule' }) {
-  const { rooms, meetings } = data
+  const { rooms, meetings, workflowTemplates: templates } = data
   const initialDate = meetings[0]?.date ? parseDate(meetings[0].date) : new Date()
   const [calendarView, setCalendarView] = useState<CalendarView>('week')
   const [cursorDate, setCursorDate] = useState(initialDate)
@@ -67,22 +78,12 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
   const [selectedTemplate, setSelectedTemplate] = useState('')
   const [draft, setDraft] = useState({ title: '', roomId: '', start: '', end: '', host: '', date: toDateKey(initialDate) })
   const [message, setMessage] = useState('')
+  const [bookingError, setBookingError] = useState('')
+  const [hasBookingConflict, setHasBookingConflict] = useState(false)
   const [meetingToDelete, setMeetingToDelete] = useState<Meeting | null>(null)
-  const [templates, setTemplates] = useState<WorkflowTemplate[]>(() => {
-    try {
-      const saved = localStorage.getItem(templateStorageKey)
-      return saved ? JSON.parse(saved) : defaultWorkflowTemplates
-    } catch {
-      return defaultWorkflowTemplates
-    }
-  })
   const [showTemplateManager, setShowTemplateManager] = useState(false)
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null)
   const [templateDraft, setTemplateDraft] = useState({ name: '', description: '', durationMinutes: 30, bufferMinutes: 0 })
-
-  useEffect(() => {
-    localStorage.setItem(templateStorageKey, JSON.stringify(templates))
-  }, [templates])
 
   const beginNewTemplate = () => {
     setEditingTemplateId(null)
@@ -99,20 +100,20 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
     })
   }
 
-  const saveTemplate = () => {
+  const saveTemplate = async () => {
     if (!templateDraft.name.trim() || templateDraft.durationMinutes < 15) return
-    if (editingTemplateId) {
-      setTemplates((current) => current.map((template) => (
-        template.id === editingTemplateId ? { ...template, ...templateDraft, name: templateDraft.name.trim() } : template
-      )))
-    } else {
-      setTemplates((current) => [...current, {
-        id: `template-${Date.now()}`,
-        ...templateDraft,
-        name: templateDraft.name.trim(),
-      }])
+    try {
+      const payload = { ...templateDraft, name: templateDraft.name.trim() }
+      if (editingTemplateId) {
+        await updateWorkflowTemplate(editingTemplateId, payload)
+      } else {
+        await createWorkflowTemplate(payload)
+      }
+      setMessage(editingTemplateId ? 'Workflow template updated.' : 'Workflow template added.')
+      beginNewTemplate()
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'The workflow template could not be saved.')
     }
-    beginNewTemplate()
   }
 
   const filteredMeetings = useMemo(
@@ -155,23 +156,47 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
 
   const saveMeeting = async () => {
     if (!draft.title || !draft.roomId || !draft.start || !draft.end || !draft.host || !draft.date) {
-      setMessage('Please complete every meeting field.')
+      setBookingError('Please complete every meeting field.')
+      setHasBookingConflict(false)
       return
     }
     if (draft.end <= draft.start) {
-      setMessage('The end time must be later than the start time.')
+      setBookingError('The end time must be later than the start time.')
+      setHasBookingConflict(false)
       return
     }
     try {
       await createMeeting({ ...draft, status: 'upcoming' })
+      const roomName = rooms.find((room) => room.id === draft.roomId)?.name || 'Selected room'
+      const bookedTime = `${formatTimeOption(draft.start)}–${formatTimeOption(draft.end)}`
+      setMessage(`${roomName} booked for ${draft.date}, ${bookedTime}.`)
       setDraft({ title: '', roomId: '', start: '', end: '', host: '', date: toDateKey(cursorDate) })
       setSelectedTemplate('')
-      setMessage('Meeting created successfully.')
+      setBookingError('')
+      setHasBookingConflict(false)
       setShowForm(false)
-    } catch {
-      setMessage('The meeting could not be saved while live services are offline.')
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'The meeting could not be saved.'
+      setBookingError(errorMessage === 'Failed to fetch' ? 'Unable to connect to the booking service. Please check that the API is running and try again.' : errorMessage)
+      setHasBookingConflict(/already booked/i.test(errorMessage))
     }
   }
+
+  const bookingDuration = draft.start && draft.end
+    ? (Number(draft.end.slice(0, 2)) * 60 + Number(draft.end.slice(3))) - (Number(draft.start.slice(0, 2)) * 60 + Number(draft.start.slice(3)))
+    : 0
+
+  const alternativeRooms = draft.date && draft.start && draft.end
+    ? rooms.filter((room) => room.id !== draft.roomId && !meetings.some((meeting) => meetingOverlaps(meeting, room.id, draft.date, draft.start, draft.end))).slice(0, 3)
+    : []
+
+  const nextAvailableTimes = bookingDuration > 0 && draft.roomId && draft.date
+    ? timeOptions
+      .filter((start) => start > draft.start)
+      .map((start) => ({ start, end: addMinutesToTime(start, bookingDuration) }))
+      .filter(({ start, end }) => end > start && !meetings.some((meeting) => meetingOverlaps(meeting, draft.roomId, draft.date, start, end)))
+      .slice(0, 3)
+    : []
 
   const renderDay = () => {
     const dayMeetings = meetingsByDate.get(toDateKey(cursorDate)) || []
@@ -267,7 +292,7 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
   )
 
   const meetingForm = (
-    <Modal open={showForm} title="New meeting" size="large" onClose={() => setShowForm(false)} actions={<>
+    <Modal open={showForm} title="New meeting" size="large" onClose={() => { setShowForm(false); setBookingError('') }} actions={<>
       <button type="button" className="btn" onClick={() => setShowForm(false)}>Cancel</button>
       <button className="btn btn-primary" type="button" onClick={saveMeeting}>Save meeting</button>
     </>}>
@@ -314,6 +339,12 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
       <label><span>Ends</span><select value={draft.end} onChange={(event) => setDraft((prev) => ({ ...prev, end: event.target.value }))}><option value="">Select time</option>{timeOptions.map((time) => <option key={time} value={time}>{formatTimeOption(time)}</option>)}</select></label>
       <label><span>Host</span><input value={draft.host} onChange={(event) => setDraft((prev) => ({ ...prev, host: event.target.value }))} placeholder="Organizer name" /></label>
     </div>
+    {draft.roomId && draft.date && draft.start && draft.end ? (
+      <div className="booking-summary">
+        <strong>Booking</strong>
+        <span>{rooms.find((room) => room.id === draft.roomId)?.name} · {draft.date} · {formatTimeOption(draft.start)}–{formatTimeOption(draft.end)}</span>
+      </div>
+    ) : null}
     </Modal>
   )
 
@@ -336,7 +367,7 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
               <button type="button" className="today-btn" onClick={() => setCursorDate(new Date())}>Today</button>
               <button type="button" className="icon-btn" aria-label="Next period" onClick={() => moveCalendar(1)}><HiChevronRight /></button>
             </div>
-            <button className="btn btn-primary" type="button" onClick={() => setShowForm(true)}>New meeting</button>
+            <button className="btn btn-primary" type="button" onClick={() => { setBookingError(''); setShowForm(true) }}>New meeting</button>
           </div>
         </div>
 
@@ -356,7 +387,7 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
           <div><p className="eyebrow">All bookings</p><h2>Meeting schedule</h2></div>
           <div className="schedule-head-actions">
             <span className="badge badge-mute">Sorted by date & time</span>
-            <button className="btn btn-primary" type="button" onClick={() => setShowForm(true)}>New meeting</button>
+            <button className="btn btn-primary" type="button" onClick={() => { setBookingError(''); setShowForm(true) }}>New meeting</button>
           </div>
         </div>
         {calendarFilters}
@@ -386,6 +417,38 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
           </table>
         </div>
       </section>}
+      <Modal
+        open={Boolean(bookingError)}
+        title={hasBookingConflict ? 'Selected time is unavailable' : 'Meeting could not be saved'}
+        size="small"
+        onClose={() => { setBookingError(''); setHasBookingConflict(false) }}
+        actions={<button type="button" className="btn btn-primary" onClick={() => { setBookingError(''); setHasBookingConflict(false) }}>Back to meeting</button>}
+      >
+        <div className="booking-popup" role="alert">
+          <p>{bookingError}</p>
+          {hasBookingConflict && (alternativeRooms.length || nextAvailableTimes.length) ? <strong>Choose an available option:</strong> : null}
+          {hasBookingConflict && alternativeRooms.length ? (
+            <div className="booking-suggestions">
+              <span>Same time, another room</span>
+              <div>{alternativeRooms.map((room) => <button type="button" key={room.id} onClick={() => {
+                setDraft((prev) => ({ ...prev, roomId: room.id }))
+                setBookingError('')
+                setHasBookingConflict(false)
+              }}>{room.name}</button>)}</div>
+            </div>
+          ) : null}
+          {hasBookingConflict && nextAvailableTimes.length ? (
+            <div className="booking-suggestions">
+              <span>Same room, next available time</span>
+              <div>{nextAvailableTimes.map(({ start, end }) => <button type="button" key={start} onClick={() => {
+                setDraft((prev) => ({ ...prev, start, end }))
+                setBookingError('')
+                setHasBookingConflict(false)
+              }}>{formatTimeOption(start)}–{formatTimeOption(end)}</button>)}</div>
+            </div>
+          ) : null}
+        </div>
+      </Modal>
       <Modal
         open={Boolean(meetingToDelete)}
         title="Cancel meeting?"
@@ -430,10 +493,15 @@ export default function SchedulePage({ data, mode = 'calendar' }: { data: Dashbo
                 <div><strong>{template.name}</strong><span>{template.durationMinutes} min · {template.bufferMinutes ? `${template.bufferMinutes} min buffer` : 'No buffer'}</span></div>
                 <div className="row-actions">
                   <button type="button" className="btn" onClick={() => beginEditTemplate(template)}>Edit</button>
-                  <button type="button" className="btn template-delete" onClick={() => {
-                    setTemplates((current) => current.filter((item) => item.id !== template.id))
-                    if (selectedTemplate === template.id) setSelectedTemplate('')
-                    if (editingTemplateId === template.id) beginNewTemplate()
+                  <button type="button" className="btn template-delete" onClick={async () => {
+                    try {
+                      await deleteWorkflowTemplate(template.id)
+                      if (selectedTemplate === template.id) setSelectedTemplate('')
+                      if (editingTemplateId === template.id) beginNewTemplate()
+                      setMessage('Workflow template removed.')
+                    } catch (error) {
+                      setMessage(error instanceof Error ? error.message : 'The workflow template could not be removed.')
+                    }
                   }}>Remove</button>
                 </div>
               </article>
