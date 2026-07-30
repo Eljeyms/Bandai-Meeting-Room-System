@@ -1,5 +1,6 @@
 export type WorkflowTemplate = {
   id: string
+  _id?: string
   name: string
   description: string
   durationMinutes: number

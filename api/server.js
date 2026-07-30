@@ -72,10 +72,18 @@ const utilizationSchema = new mongoose.Schema({
   pct: { type: Number, required: true },
 });
 
+const workflowTemplateSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  description: { type: String, default: '', trim: true },
+  durationMinutes: { type: Number, required: true, min: 15 },
+  bufferMinutes: { type: Number, default: 0, min: 0 },
+});
+
 const Room = mongoose.model('Room', roomSchema);
 const Meeting = mongoose.model('Meeting', meetingSchema);
 const User = mongoose.model('User', userSchema);
 const Utilization = mongoose.model('Utilization', utilizationSchema);
+const WorkflowTemplate = mongoose.model('WorkflowTemplate', workflowTemplateSchema);
 
 const seedData = async () => {
   const rooms = [
@@ -129,6 +137,20 @@ const seedData = async () => {
   ];
   await Utilization.deleteMany({ day: { $in: utilization.map((item) => item.day) } });
   await Utilization.insertMany(utilization);
+
+  const workflowTemplates = [
+    { name: 'Standard Meeting', description: 'General team meeting', durationMinutes: 30, bufferMinutes: 5 },
+    { name: 'Client Presentation', description: 'Presentation-ready setup', durationMinutes: 60, bufferMinutes: 15 },
+    { name: 'Team Workshop', description: 'Long-form collaboration session', durationMinutes: 120, bufferMinutes: 15 },
+    { name: 'Quick Huddle', description: 'Short discussion', durationMinutes: 15, bufferMinutes: 0 },
+  ];
+  await WorkflowTemplate.bulkWrite(workflowTemplates.map((template) => ({
+    updateOne: {
+      filter: { name: template.name },
+      update: { $setOnInsert: template },
+      upsert: true,
+    },
+  })));
 };
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
@@ -196,14 +218,43 @@ app.get('/api/meetings', async (_req, res) => {
   res.json(meetings);
 });
 
+const findMeetingConflict = async ({ roomId, date, start, end }, excludeId) => {
+  if (!roomId || !date || !start || !end) return null;
+  const query = {
+    roomId,
+    date,
+    start: { $lt: end },
+    end: { $gt: start },
+  };
+  if (excludeId) query._id = { $ne: excludeId };
+  return Meeting.findOne(query).lean();
+};
+
 app.post('/api/meetings', async (req, res) => {
+  const conflict = await findMeetingConflict(req.body);
+  if (conflict) {
+    return res.status(409).json({
+      error: 'This room is already booked during the selected time.',
+      conflict,
+    });
+  }
   const meeting = await Meeting.create(req.body);
   io.emit('meetings:updated', meeting);
   res.status(201).json(meeting);
 });
 
 app.put('/api/meetings/:id', async (req, res) => {
-  const meeting = await Meeting.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const existing = await Meeting.findById(req.params.id).lean();
+  if (!existing) return res.status(404).json({ error: 'Meeting not found' });
+  const candidate = { ...existing, ...req.body };
+  const conflict = await findMeetingConflict(candidate, req.params.id);
+  if (conflict) {
+    return res.status(409).json({
+      error: 'This room is already booked during the selected time.',
+      conflict,
+    });
+  }
+  const meeting = await Meeting.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
   if (!meeting) return res.status(404).json({ error: 'Meeting not found' });
   io.emit('meetings:updated', meeting);
   res.json(meeting);
@@ -213,6 +264,31 @@ app.delete('/api/meetings/:id', async (req, res) => {
   const meeting = await Meeting.findByIdAndDelete(req.params.id);
   if (!meeting) return res.status(404).json({ error: 'Meeting not found' });
   io.emit('meetings:updated', meeting);
+  res.json({ success: true });
+});
+
+app.get('/api/workflow-templates', async (_req, res) => {
+  const templates = await WorkflowTemplate.find().sort({ name: 1 }).lean();
+  res.json(templates);
+});
+
+app.post('/api/workflow-templates', async (req, res) => {
+  const template = await WorkflowTemplate.create(req.body);
+  io.emit('templates:updated', template);
+  res.status(201).json(template);
+});
+
+app.put('/api/workflow-templates/:id', async (req, res) => {
+  const template = await WorkflowTemplate.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+  if (!template) return res.status(404).json({ error: 'Workflow template not found' });
+  io.emit('templates:updated', template);
+  res.json(template);
+});
+
+app.delete('/api/workflow-templates/:id', async (req, res) => {
+  const template = await WorkflowTemplate.findByIdAndDelete(req.params.id);
+  if (!template) return res.status(404).json({ error: 'Workflow template not found' });
+  io.emit('templates:updated', template);
   res.json({ success: true });
 });
 
@@ -253,13 +329,14 @@ app.post('/api/ai/detect', async (req, res) => {
 });
 
 app.get('/api/dashboard', async (_req, res) => {
-  const [rooms, meetings, users, utilization] = await Promise.all([
+  const [rooms, meetings, users, utilization, workflowTemplates] = await Promise.all([
     Room.find().lean(),
     Meeting.find().lean(),
     User.find().lean(),
     Utilization.find().lean(),
+    WorkflowTemplate.find().sort({ name: 1 }).lean(),
   ]);
-  res.json({ rooms, meetings, users, utilization });
+  res.json({ rooms, meetings, users, utilization, workflowTemplates });
 });
 
 app.get('/api/rooms/:id', async (req, res) => {
@@ -336,4 +413,4 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename
   startServer();
 }
 
-export { app, io, Room, Meeting, User, Utilization, seedData, startServer, connectDb, memoryServer };
+export { app, io, Room, Meeting, User, Utilization, WorkflowTemplate, seedData, startServer, connectDb, memoryServer };
