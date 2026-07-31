@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   HiArrowPath,
   HiBars3,
@@ -24,7 +24,6 @@ import RoomDisplayPage from './pages/RoomDisplayPage'
 import RoomOverviewPage from './pages/RoomOverviewPage'
 import RoomsPage from './pages/RoomsPage'
 import SchedulePage from './pages/SchedulePage'
-import WorkflowTemplatesPage from './pages/WorkflowTemplatesPage'
 import useDashboard from './hooks/useDashboard'
 import './index.css'
 
@@ -32,7 +31,6 @@ type PageKey =
   | 'dashboard'
   | 'reports'
   | 'rooms'
-  | 'workflow'
   | 'schedule'
   | 'calendar'
   | 'hris'
@@ -58,7 +56,6 @@ const adminLinks = [
   { key: 'dashboard', label: 'Dashboard', icon: HiOutlineTableCells },
   { key: 'reports', label: 'Reports', icon: HiOutlineChartBar },
   { key: 'rooms', label: 'Room Management', icon: HiOutlineBuildingOffice2 },
-  { key: 'workflow', label: 'Workflow Templates', icon: HiOutlineClipboardDocumentList },
   { key: 'schedule', label: 'Schedule', icon: HiOutlineClipboardDocumentList },
   { key: 'calendar', label: 'Calendar', icon: HiOutlineCalendarDays },
   { key: 'hris', label: 'HRIS Accounts', icon: HiOutlineUserGroup },
@@ -77,7 +74,6 @@ const pageHeaders: Record<Exclude<PageKey, 'public'>, { eyebrow: string; title: 
   dashboard: { eyebrow: 'Meeting room administration', title: 'Admin Dashboard', description: 'System-wide room operations, schedules, and access' },
   reports: { eyebrow: 'Insights & utilization', title: 'Reports', description: 'Usage trends and room performance metrics' },
   rooms: { eyebrow: 'Room fleet', title: 'Room Management', description: 'Manage room setup, sensors, tablets, and availability' },
-  workflow: { eyebrow: 'Booking standards', title: 'Workflow Templates', description: 'Reusable meeting rules and room preparation presets' },
   schedule: { eyebrow: 'Booking operations', title: 'Schedule', description: 'Create and manage meeting bookings' },
   calendar: { eyebrow: 'Calendar workspace', title: 'Calendar', description: 'Review schedules by day, week, or month' },
   hris: { eyebrow: 'Identity integration', title: 'HRIS Accounts', description: 'Employee accounts and room-access role mapping' },
@@ -101,6 +97,7 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const notificationsRef = useRef<HTMLDivElement>(null)
 
   const addNotification = (text: string) => {
     const time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
@@ -135,6 +132,21 @@ function App() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!notificationsOpen) return
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [notificationsOpen])
+
+  const toggleNotifications = () => {
+    setNotificationsOpen((open) => !open)
+  }
+
   const navigate = (page: PageKey) => {
     setSelectedPage(page)
     setMenuOpen(false)
@@ -158,8 +170,12 @@ function App() {
       {menuOpen && <button className="nav-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
       <aside className={`side ${menuOpen ? 'is-open' : ''}`}>
         <div className="brand">
-          <div className="chip">
-            <img src="/assets/img/images-removebg.png" alt="Bandai Namco" />
+          <div className="brand-mark">
+            <img src="/assets/img/bandai-badge.png" alt="Bandai" />
+          </div>
+          <div className="brand-copy">
+            <strong>Bandai Namco</strong>
+            <span>Meeting Room System</span>
           </div>
           <button className="close-menu" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><HiXMark /></button>
         </div>
@@ -174,7 +190,7 @@ function App() {
         </div>
 
         <nav aria-label="Primary navigation">
-          <div className="section-label">{activeRole === 'admin' ? 'Administration' : 'Front Desk'}</div>
+          <div className="section-label">{activeRole === 'admin' ? 'Manage' : 'Front Desk'}</div>
           {roleLinks.map((link) => (
             <button
               type="button"
@@ -189,7 +205,7 @@ function App() {
 
           {activeRole === 'admin' && (
             <>
-              <div className="section-label">Room Displays</div>
+              <div className="section-label">Displays</div>
               <button type="button" className={selectedPage === 'display' ? 'active' : ''} onClick={() => navigate('display')}>
                 <span className="ico"><HiComputerDesktop /></span>Room Display
               </button>
@@ -226,12 +242,14 @@ function App() {
                 <option value="public">Public schedule</option>
               </select>
             </label>
-            <div className="notification-wrapper">
+            <div className="notification-wrapper" ref={notificationsRef}>
               <button
                 type="button"
                 className="topbar-icon"
                 aria-label="Notifications"
-                onClick={() => setNotificationsOpen((prev) => !prev)}
+                aria-haspopup="true"
+                aria-expanded={notificationsOpen}
+                onClick={toggleNotifications}
               >
                 <HiOutlineBell />
                 {notifications.length > 0 ? <span className="notification-dot" /> : null}
@@ -267,7 +285,7 @@ function App() {
         </header>
       )}
 
-      <main className={`content ${hidePageHeader ? 'display-content' : 'admin-content'}`}>
+      <main className={`content ${hidePageHeader ? 'display-content' : 'admin-content'} ${selectedPage === 'calendar' || selectedPage === 'frontdesk-calendar' ? 'calendar-content' : ''}`}>
         {!hidePageHeader && (
           <header className="page-head">
             <div>
@@ -294,7 +312,6 @@ function App() {
         {selectedPage === 'dashboard' && <DashboardPage data={data} />}
         {selectedPage === 'reports' && <ReportsPage data={data} />}
         {selectedPage === 'rooms' && <RoomsPage data={data} />}
-        {selectedPage === 'workflow' && <WorkflowTemplatesPage />}
         {selectedPage === 'schedule' && <SchedulePage data={data} mode="schedule" />}
         {selectedPage === 'calendar' && <SchedulePage data={data} mode="calendar" />}
         {selectedPage === 'hris' && <HrisAccountsPage data={data} />}

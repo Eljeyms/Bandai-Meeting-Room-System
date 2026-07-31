@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { HiOutlineChevronDown, HiOutlineCpuChip, HiOutlineLightBulb } from 'react-icons/hi2'
+import { HiOutlineCheckCircle, HiOutlineChevronDown, HiOutlineCpuChip, HiOutlineLightBulb, HiOutlineUserGroup } from 'react-icons/hi2'
 import { FaFan, FaSnowflake } from 'react-icons/fa6'
 import { updateSmartControls, type DashboardData, type Room, type SmartRoomControls } from '../lib/api'
 
@@ -201,7 +201,7 @@ export default function RoomDisplayPage({ data }: { data: DashboardData }) {
           <div className="stage-inner">
             <div className="status-word">{ongoingMeeting ? 'Occupied' : 'Available'}</div>
             <div className="phi-divider" aria-hidden="true" />
-            <div className="status-icon">{ongoingMeeting ? '🏢' : '✔️'}</div>
+            <div className="status-icon">{ongoingMeeting ? <HiOutlineUserGroup /> : <HiOutlineCheckCircle />}</div>
             <p className="status-sub">
               {ongoingMeeting ? 'This room is currently in use' : 'This room is free and ready to book'}
             </p>

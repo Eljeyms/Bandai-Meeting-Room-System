@@ -53,6 +53,7 @@ export type DashboardData = {
   meetings: Meeting[]
   users: User[]
   utilization: UtilizationDatum[]
+  workflowTemplates: import('../workflowTemplates').WorkflowTemplate[]
 }
 
 const fallbackBaseUrl = 'http://127.0.0.1:4000'
@@ -69,6 +70,7 @@ const normalizeDashboard = (payload: DashboardData): DashboardData => ({
   meetings: payload.meetings.map((meeting) => normalize(meeting)),
   users: payload.users.map((user) => normalize(user)),
   utilization: payload.utilization.map((item) => normalize(item)),
+  workflowTemplates: (payload.workflowTemplates || []).map((template) => normalize(template)),
 })
 
 const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
@@ -79,8 +81,8 @@ const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
     ...options,
   })
   if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(errorText || 'Request failed')
+    const errorPayload = await response.json().catch(() => null) as { error?: string } | null
+    throw new Error(errorPayload?.error || 'Request failed')
   }
   return response.json() as Promise<T>
 }
@@ -116,6 +118,18 @@ export const updateMeeting = async (meetingId: string, payload: Partial<Meeting>
 
 export const deleteMeeting = async (meetingId: string) => {
   return request<{ success: boolean }>(`/api/meetings/${meetingId}`, { method: 'DELETE' })
+}
+
+export const createWorkflowTemplate = async (payload: Omit<import('../workflowTemplates').WorkflowTemplate, 'id' | '_id'>) => {
+  return request<import('../workflowTemplates').WorkflowTemplate>('/api/workflow-templates', { method: 'POST', body: JSON.stringify(payload) })
+}
+
+export const updateWorkflowTemplate = async (templateId: string, payload: Partial<import('../workflowTemplates').WorkflowTemplate>) => {
+  return request<import('../workflowTemplates').WorkflowTemplate>(`/api/workflow-templates/${templateId}`, { method: 'PUT', body: JSON.stringify(payload) })
+}
+
+export const deleteWorkflowTemplate = async (templateId: string) => {
+  return request<{ success: boolean }>(`/api/workflow-templates/${templateId}`, { method: 'DELETE' })
 }
 
 export const createUser = async (payload: Omit<User, 'id' | '_id'>) => {

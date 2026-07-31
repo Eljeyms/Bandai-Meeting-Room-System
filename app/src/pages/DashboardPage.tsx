@@ -84,63 +84,6 @@ export default function DashboardPage({ data }: { data: DashboardData }) {
         })}
       </section>
 
-      <section className="card quick-actions-card">
-        <div className="dashboard-section-head">
-          <span className="section-icon"><HiOutlineBolt /></span>
-          <div>
-            <h2>Quick Actions</h2>
-            <p>Common room administration tasks</p>
-          </div>
-        </div>
-        <div className="quick-action-buttons">
-          {quickActions.map((action) => {
-            const Icon = action.icon
-            return (
-              <a className="quick-action" key={action.label} href={action.href}>
-                <Icon />
-                <span>{action.label}</span>
-              </a>
-            )
-          })}
-        </div>
-      </section>
-
-      <section className="dashboard-shortcuts">
-        <div className="dashboard-section-head">
-          <span className="section-icon"><HiOutlineCog6Tooth /></span>
-          <div>
-            <h2>Administration Shortcuts</h2>
-            <p>Go directly to the tools you use most</p>
-          </div>
-        </div>
-        <div className="shortcut-grid">
-          {shortcuts.map((group) => {
-            const GroupIcon = group.icon
-            return (
-              <article className="shortcut-group" key={group.title}>
-                <header>
-                  <span><GroupIcon /></span>
-                  <h3>{group.title}</h3>
-                  <small>{group.items.length}</small>
-                </header>
-                <div className="shortcut-links">
-                  {group.items.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <a href={item.href} key={item.label}>
-                        <span className="shortcut-link-icon"><Icon /></span>
-                        <strong>{item.label}</strong>
-                        <HiOutlineArrowRight className="shortcut-arrow" />
-                      </a>
-                    )
-                  })}
-                </div>
-              </article>
-            )
-          })}
-        </div>
-      </section>
-
       <section className="golden-cols">
         <div className="card block">
           <div className="block-head">
@@ -213,6 +156,64 @@ export default function DashboardPage({ data }: { data: DashboardData }) {
           </table>
         </div>
       </section>
+
+      <section className="card quick-actions-card">
+        <div className="dashboard-section-head">
+          <span className="section-icon"><HiOutlineBolt /></span>
+          <div>
+            <h2>Quick Actions</h2>
+            <p>Common room administration tasks</p>
+          </div>
+        </div>
+        <div className="quick-action-buttons">
+          {quickActions.map((action) => {
+            const Icon = action.icon
+            return (
+              <a className="quick-action" key={action.label} href={action.href}>
+                <Icon />
+                <span>{action.label}</span>
+              </a>
+            )
+          })}
+        </div>
+      </section>
+
+      <section className="dashboard-shortcuts">
+        <div className="dashboard-section-head">
+          <span className="section-icon"><HiOutlineCog6Tooth /></span>
+          <div>
+            <h2>Administration Shortcuts</h2>
+            <p>Go directly to the tools you use most</p>
+          </div>
+        </div>
+        <div className="shortcut-grid">
+          {shortcuts.map((group) => {
+            const GroupIcon = group.icon
+            return (
+              <article className="shortcut-group" key={group.title}>
+                <header>
+                  <span><GroupIcon /></span>
+                  <h3>{group.title}</h3>
+                  <small>{group.items.length}</small>
+                </header>
+                <div className="shortcut-links">
+                  {group.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <a href={item.href} key={item.label}>
+                        <span className="shortcut-link-icon"><Icon /></span>
+                        <strong>{item.label}</strong>
+                        <HiOutlineArrowRight className="shortcut-arrow" />
+                      </a>
+                    )
+                  })}
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </section>
+
     </>
   )
 }
