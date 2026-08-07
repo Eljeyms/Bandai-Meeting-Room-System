@@ -18,8 +18,8 @@
 
       html, body {
         width: 100%;
-        height: 100%;
-        overflow: hidden;
+        min-height: 100%;
+        overflow-x: hidden;
       }
 
       body {
@@ -31,8 +31,10 @@
       }
 
       .display {
+        height: 100vh;
         height: 100dvh;
-        min-height: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
         display: grid;
         grid-template-columns: 190px minmax(360px, 1fr) minmax(520px, 2.45fr);
         grid-template-rows: auto minmax(0, 1fr) auto;
@@ -108,7 +110,6 @@
         cursor: pointer;
       }
 
-      .meeting.active { box-shadow: 0 5px 13px rgba(230, 0, 18, 0.1); }
       .meeting.selected { border-color: var(--orange); box-shadow: 0 5px 13px rgba(255, 138, 0, 0.18); }
       .meeting:focus-visible { outline: 3px solid rgba(255, 138, 0, 0.42); outline-offset: 3px; }
       .meeting-bar { align-self: stretch; background: var(--orange); }
@@ -129,8 +130,8 @@
         border-radius: 42px 42px 56px 42px;
         background: radial-gradient(circle at 52% 42%, #fff 0 31%, rgba(255, 246, 247, 0.92) 60%, rgba(255, 226, 229, 0.9) 100%);
         display: flex;
-        align-items: center;
         justify-content: center;
+        overflow-y: auto;
         position: relative;
       }
 
@@ -142,8 +143,8 @@
       .status-card {
         --state-color: var(--red);
         width: min(100%, 760px);
-        min-height: 0;
-        height: 100%;
+        height: auto;
+        margin: auto;
         padding: 56px 40px 42px;
         border-radius: 60px;
         background: rgba(255, 255, 255, 0.78);
@@ -152,6 +153,8 @@
         align-items: center;
         text-align: center;
       }
+
+      .status-card > * { flex-shrink: 0; }
 
       .status-card.vacant { --state-color: #169a4a; }
 
@@ -179,55 +182,42 @@
 
       .footer strong { color: var(--red); margin-right: 10px; }
 
-      @media (max-width: 1100px) {
-        .display { grid-template-columns: 128px minmax(240px, 0.82fr) minmax(340px, 1.3fr); gap: 0 22px; padding: 0 24px 16px 0; }
-        .heading { padding-top: 32px; }
-        .heading h1 { font-size: 2.4rem; }
-        .datetime { gap: 18px; padding-top: 22px; }
-        .datetime .date, .datetime .time { font-size: 1.55rem; }
-        .datetime .time { padding-left: 18px; }
-        .schedule-panel { margin-top: 34px; padding: 16px; }
-        .meeting { min-height: 76px; grid-template-columns: 5px 36px 1fr 18px; }
-        .meeting-icon { font-size: 1.35rem; }
-        .status-shell { margin-top: 18px; height: calc(100% - 18px); padding: 26px; border-radius: 30px 30px 40px 30px; }
-        .status-card { padding: 30px 24px; border-radius: 38px; }
-        .status-word { font-size: clamp(3.4rem, 7vw, 5.6rem); }
-        .status-rule { margin: 28px 0 24px; }
-        .people-icon { width: 110px; }
-        .status-message { margin: 16px 0 12px; font-size: 1.05rem; }
-        .meeting-focus { font-size: 1.2rem; }
-        .meeting-focus-time, .meeting-countdown, .meeting-attendance { font-size: 1rem; }
-        .meeting-meta { margin-top: 10px; }
-        .footer { margin-top: 16px; padding-top: 9px; }
-      }
-
-      @media (max-width: 900px) and (orientation: portrait) {
-        .display { grid-template-columns: 108px minmax(0, 1fr); grid-template-rows: 100px 210px minmax(0, 1fr) 40px; gap: 0 16px; padding-right: 16px; }
-        .brand-panel { padding: 20px 12px; }
-        .brand-panel p { display: none; }
-        .heading { grid-column: 2; grid-row: 1; padding-top: 22px; }
-        .heading h1 { font-size: 2rem; }
-        .datetime { grid-column: 2; grid-row: 1; }
-        .datetime .date, .datetime .time { font-size: 1.25rem; }
-        .schedule-panel { grid-column: 2; grid-row: 2; align-self: stretch; margin-top: 0; padding: 12px; }
-        .schedule-panel h2 { margin-bottom: 10px; }
-        .schedule-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-        .meeting { min-height: 118px; grid-template-columns: 4px 1fr; grid-template-rows: 28px 1fr 28px; padding: 8px; }
-        .meeting-bar { grid-row: 1 / 4; margin: -8px 0 -8px -8px; }
-        .meeting-icon { display: none; }
-        .meeting-name { font-size: 0.88rem; }
-        .meeting-time { font-size: 0.76rem; }
-        .chevron { display: none; }
-        .status-shell { grid-column: 2; grid-row: 3; min-height: 0; margin-top: 12px; height: calc(100% - 12px); padding: 18px; }
-        .status-card { padding: 22px 18px; }
-        .status-word { font-size: clamp(3.2rem, 9vw, 4.8rem); }
-        .status-rule { margin: 22px 0 18px; }
-        .people-icon { width: 92px; }
-        .footer { grid-column: 2; grid-row: 4; margin-top: 8px; padding-top: 7px; font-size: 0.78rem; }
+      @media (min-width: 681px) and (max-width: 1200px) {
+        .display {
+          grid-template-columns: 108px minmax(0, 0.92fr) minmax(0, 1.08fr);
+          grid-template-rows: auto minmax(0, 1fr) auto;
+          gap: 0 3.2%;
+          padding: 0 4% 18px 0;
+        }
+        .brand-panel { padding: 22px 12px; }
+        .brand-panel p { font-size: 0.64rem; }
+        .heading { padding-top: 30px; }
+        .heading h1 { font-size: clamp(1.7rem, 3.6vw, 2.6rem); }
+        .heading p { margin: 4px 0 0; font-size: 0.95rem; }
+        .datetime { justify-self: end; align-self: center; gap: 16px; padding-top: 14px; }
+        .datetime .date, .datetime .time { font-size: clamp(1.05rem, 2.6vw, 1.5rem); }
+        .datetime .time { padding-left: 16px; }
+        .schedule-panel { margin-top: 26px; padding: 14px 16px; }
+        .schedule-panel h2 { font-size: 0.98rem; margin-bottom: 12px; }
+        .schedule-list { gap: 8px; }
+        .meeting { min-height: 74px; grid-template-columns: 5px 34px 1fr 16px; }
+        .meeting-icon { font-size: 1.3rem; }
+        .meeting-name { font-size: 0.95rem; }
+        .meeting-time { font-size: 0.85rem; }
+        .status-shell { margin-top: 26px; height: calc(100% - 26px); padding: clamp(18px, 3vh, 34px); border-radius: 30px; }
+        .status-card { padding: 26px 22px; border-radius: 34px; }
+        .status-word { font-size: clamp(3rem, 6vw, 5.2rem); }
+        .status-rule { margin: 24px 0 20px; }
+        .people-icon { width: clamp(84px, 12vw, 120px); }
+        .status-message { margin: 14px 0 10px; font-size: 1rem; }
+        .meeting-focus { font-size: 1.12rem; }
+        .meeting-focus-time, .meeting-countdown, .meeting-attendance { font-size: 0.95rem; }
+        .meeting-meta { margin-top: 10px; font-size: 0.9rem; }
+        .footer { margin-top: 20px; padding-top: 10px; }
       }
 
       @media (max-width: 680px) {
-        .display { display: block; height: auto; min-height: 100dvh; padding: 0 18px 20px; overflow: visible; }
+        .display { display: block; height: auto; min-height: 100vh; min-height: 100dvh; padding: 0 18px 20px; overflow: visible; }
         html, body { height: auto; overflow: auto; }
         .brand-panel { margin: 0 -18px; border-radius: 0 0 16px 16px; min-height: auto; padding: 18px; }
         .brand-panel p { display: none; }
@@ -239,6 +229,32 @@
         .status-card { min-height: 420px; padding: 42px 18px 30px; border-radius: 36px; }
         .status-rule { margin: 34px 0 26px; }
         .footer { margin-top: 24px; }
+      }
+
+      @media (max-height: 800px) and (min-width: 681px) {
+        .status-shell { padding: 16px; }
+        .status-card { padding: 22px 20px; border-radius: 38px; }
+        .status-word { font-size: clamp(2.6rem, 7vw, 4rem); }
+        .status-rule { margin: 14px 0 10px; }
+        .people-icon { width: clamp(70px, 11vw, 92px); }
+        .status-message { margin: 10px 0 8px; font-size: 1rem; }
+        .meeting-focus { font-size: 1.05rem; }
+        .meeting-focus-time, .meeting-countdown, .meeting-attendance { font-size: 0.92rem; }
+        .meeting-meta { margin-top: 8px; font-size: 0.9rem; }
+      }
+
+      @media (max-height: 650px) and (min-width: 681px) {
+        .heading { padding-top: 14px; }
+        .heading p { margin: 2px 0 0; }
+        .status-shell { margin-top: 12px; height: calc(100% - 12px); }
+        .status-card { padding: 14px 16px; }
+        .status-word { font-size: clamp(2.2rem, 5.5vw, 3.2rem); }
+        .status-rule { margin: 10px 0 8px; }
+        .people-icon { width: 62px; }
+        .status-message { margin: 8px 0 6px; font-size: 0.95rem; }
+        .meeting-focus { font-size: 1rem; }
+        .meeting-focus-time, .meeting-countdown, .meeting-attendance { font-size: 0.9rem; }
+        .meeting-meta { margin-top: 6px; font-size: 0.88rem; }
       }
     </style>
   </head>
@@ -264,15 +280,15 @@
         <div class="schedule-list" id="scheduleList"></div>
       </section>
 
-      <section class="status-shell occupied" id="statusShell" aria-live="polite">
-        <div class="status-card occupied" id="statusCard">
-          <h2 class="status-word" id="statusWord">Occupied</h2>
+      <section class="status-shell vacant" id="statusShell" aria-live="polite">
+        <div class="status-card vacant" id="statusCard">
+          <h2 class="status-word" id="statusWord">Vacant</h2>
           <div class="status-rule" aria-hidden="true"><span></span></div>
           <svg class="people-icon" viewBox="0 0 160 120" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5">
             <circle cx="80" cy="27" r="20"></circle><circle cx="42" cy="42" r="15"></circle><circle cx="118" cy="42" r="15"></circle>
             <path d="M48 110v-20c0-19 14-34 32-34s32 15 32 34v20H48Z"></path><path d="M13 104V85c0-15 12-27 27-27 8 0 15 3 20 8M147 104V85c0-15-12-27-27-27-8 0-15 3-20 8"></path>
           </svg>
-          <p class="status-message" id="statusMessage">This room is currently in use</p>
+          <p class="status-message" id="statusMessage">This room is currently available</p>
           <div class="meeting-focus" id="focusTitle">Design Review</div>
           <div class="meeting-focus-time" id="focusTime">10:00 AM – 11:00 AM</div>
           <div class="meeting-countdown" id="focusCountdown">Ends in 00:30:00</div>
@@ -311,9 +327,10 @@
         const list = document.getElementById('scheduleList');
         list.innerHTML = '';
         meetings.forEach((meeting, index) => {
+          if (currentMinutes >= meeting.start && currentMinutes < meeting.end) return;
           const item = document.createElement('button');
           item.type = 'button';
-          item.className = `meeting${currentMinutes >= meeting.start && currentMinutes < meeting.end ? ' active' : ''}${selectedMeetingIndex === index ? ' selected' : ''}`;
+          item.className = `meeting${selectedMeetingIndex === index ? ' selected' : ''}`;
           item.setAttribute('aria-pressed', String(selectedMeetingIndex === index));
           item.setAttribute('aria-label', `View details for ${meeting.title}`);
           item.innerHTML = `<span class="meeting-bar"></span><span class="meeting-icon" aria-hidden="true">▣</span><div><div class="meeting-name"></div><div class="meeting-time"></div></div><span class="chevron" aria-hidden="true">›</span>`;
@@ -330,33 +347,25 @@
       function updateDisplay() {
         const now = new Date();
         const minutes = now.getHours() * 60 + now.getMinutes();
-        const current = meetings.find(meeting => minutes >= meeting.start && minutes < meeting.end);
         const next = meetings.find(meeting => meeting.start > minutes);
         const selected = selectedMeetingIndex === null ? null : meetings[selectedMeetingIndex];
-        const focus = selected || current || next;
+        const focus = selected || next;
         const countdown = document.getElementById('focusCountdown');
         const attendance = document.getElementById('attendanceCount');
 
         document.getElementById('currentTime').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         document.getElementById('todayLabel').textContent = now.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('statusWord').textContent = current ? 'Occupied' : 'Vacant';
-        document.getElementById('statusMessage').textContent = current ? 'This room is currently in use' : 'This room is currently available';
-        document.getElementById('statusShell').className = `status-shell ${current ? 'occupied' : 'vacant'}`;
-        document.getElementById('statusCard').className = `status-card ${current ? 'occupied' : 'vacant'}`;
+        document.getElementById('statusWord').textContent = 'Vacant';
+        document.getElementById('statusMessage').textContent = 'This room is currently available';
+        document.getElementById('statusShell').className = 'status-shell vacant';
+        document.getElementById('statusCard').className = 'status-card vacant';
 
         if (focus) {
-          document.getElementById('focusTitle').textContent = selected ? `Scheduled: ${focus.title}` : (current ? focus.title : `Next: ${focus.title}`);
+          document.getElementById('focusTitle').textContent = selected ? `Scheduled: ${focus.title}` : `Next: ${focus.title}`;
           document.getElementById('focusTime').textContent = `${formatTime(focus.start)} – ${formatTime(focus.end)}`;
           document.getElementById('focusMeta').innerHTML = `Host: ${focus.host}<br />Attendees: ${focus.attendees}`;
           attendance.textContent = `${focus.attendees} ${focus.attendees === 1 ? 'person' : 'people'} in room`;
-          if (current && focus === current) {
-            const meetingEnd = new Date(now);
-            meetingEnd.setHours(Math.floor(focus.end / 60), focus.end % 60, 0, 0);
-            const secondsRemaining = Math.max(0, Math.floor((meetingEnd - now) / 1000));
-            countdown.textContent = `Ends in ${formatDuration(secondsRemaining)}`;
-          } else {
-            countdown.textContent = `Duration: ${formatDuration((focus.end - focus.start) * 60)}`;
-          }
+          countdown.textContent = `Duration: ${formatDuration((focus.end - focus.start) * 60)}`;
         } else {
           document.getElementById('focusTitle').textContent = 'No more meetings today';
           document.getElementById('focusTime').textContent = '';
