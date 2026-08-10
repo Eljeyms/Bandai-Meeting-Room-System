@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Meeting Room 3A</title>
+    <title>Meeting Room 1</title>
     <style>
       :root {
         --red: #e60012;
@@ -63,7 +63,7 @@
         padding-top: 54px;
       }
 
-      .heading h1 { margin: 0; font-size: clamp(2rem, 3.1vw, 3.2rem); letter-spacing: -0.05em; }
+      .heading h1 { margin: 0; font-size: clamp(2rem, 3.1vw, 3.2rem); }
       .heading p { margin: 6px 0 0; color: var(--muted); font-size: 1.05rem; }
 
       .datetime {
@@ -77,7 +77,7 @@
       }
 
       .datetime .date, .datetime .time { font-size: 1.8rem; }
-      .datetime .time { border-left: 2px solid #2d2d2d; padding-left: 26px; letter-spacing: -0.04em; }
+      .datetime .time { border-left: 2px solid #2d2d2d; padding-left: 26px; }
 
       .schedule-panel {
         grid-column: 2;
@@ -92,31 +92,6 @@
 
       .schedule-panel h2 { margin: 0 0 17px; font-size: 1.08rem; }
       .schedule-list { display: grid; gap: 12px; }
-
-      .meeting {
-        display: grid;
-        grid-template-columns: 5px 46px 1fr 20px;
-        align-items: center;
-        min-height: 86px;
-        overflow: hidden;
-        border: 1px solid #ededf0;
-        border-radius: 15px;
-        background: #fbfbfc;
-        width: 100%;
-        padding: 0;
-        color: inherit;
-        font: inherit;
-        text-align: left;
-        cursor: pointer;
-      }
-
-      .meeting.selected { border-color: var(--orange); box-shadow: 0 5px 13px rgba(255, 138, 0, 0.18); }
-      .meeting:focus-visible { outline: 3px solid rgba(255, 138, 0, 0.42); outline-offset: 3px; }
-      .meeting-bar { align-self: stretch; background: var(--orange); }
-      .meeting-icon { color: var(--orange); font-size: 1.65rem; text-align: center; }
-      .meeting-name { font-size: 1rem; font-weight: 800; }
-      .meeting-time { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
-      .chevron { color: #4d4d4d; font-size: 1.8rem; font-weight: 300; }
       .empty-schedule { color: var(--muted); margin: 12px 0; }
 
       .status-shell {
@@ -131,7 +106,6 @@
         background: radial-gradient(circle at 52% 42%, #fff 0 31%, rgba(255, 246, 247, 0.92) 60%, rgba(255, 226, 229, 0.9) 100%);
         display: flex;
         justify-content: center;
-        overflow-y: auto;
         position: relative;
       }
 
@@ -158,17 +132,13 @@
 
       .status-card.vacant { --state-color: #169a4a; }
 
-      .status-word { margin: 0; color: var(--state-color); font-size: clamp(4rem, 7.6vw, 7.5rem); letter-spacing: -0.08em; line-height: 0.9; }
+      .status-word { margin: 0; color: var(--state-color); font-size: clamp(4rem, 7.6vw, 7.5rem); line-height: 1; }
       .status-rule { display: flex; align-items: center; width: 100%; margin: 46px 0 36px; color: var(--state-color); }
       .status-rule::before, .status-rule::after { content: ""; height: 2px; flex: 1; background: currentColor; }
       .status-rule span { width: 17px; height: 17px; border-radius: 50%; background: currentColor; margin: 0 7px; }
       .people-icon { width: 138px; color: var(--state-color); }
       .status-message { margin: 25px 0 16px; color: #565962; font-size: 1.25rem; }
-      .meeting-focus { font-size: 1.45rem; font-weight: 800; }
-      .meeting-focus-time { margin-top: 4px; color: #4d515a; font-size: 1.15rem; }
-      .meeting-countdown { margin-top: 10px; color: var(--state-color); font-size: 1.15rem; font-weight: 800; }
-      .meeting-attendance { margin-top: 8px; color: var(--ink); font-size: 1.08rem; font-weight: 800; }
-      .meeting-meta { margin-top: 15px; color: #5e626b; line-height: 1.5; font-size: 0.98rem; }
+      .meeting-meta { margin-top: 16px; color: #5e626b; line-height: 1.5; font-size: 0.98rem; }
 
       .footer {
         grid-column: 2 / 4;
@@ -200,18 +170,12 @@
         .schedule-panel { margin-top: 26px; padding: 14px 16px; }
         .schedule-panel h2 { font-size: 0.98rem; margin-bottom: 12px; }
         .schedule-list { gap: 8px; }
-        .meeting { min-height: 74px; grid-template-columns: 5px 34px 1fr 16px; }
-        .meeting-icon { font-size: 1.3rem; }
-        .meeting-name { font-size: 0.95rem; }
-        .meeting-time { font-size: 0.85rem; }
         .status-shell { margin-top: 26px; height: calc(100% - 26px); padding: clamp(18px, 3vh, 34px); border-radius: 30px; }
         .status-card { padding: 26px 22px; border-radius: 34px; }
         .status-word { font-size: clamp(3rem, 6vw, 5.2rem); }
         .status-rule { margin: 24px 0 20px; }
         .people-icon { width: clamp(84px, 12vw, 120px); }
         .status-message { margin: 14px 0 10px; font-size: 1rem; }
-        .meeting-focus { font-size: 1.12rem; }
-        .meeting-focus-time, .meeting-countdown, .meeting-attendance { font-size: 0.95rem; }
         .meeting-meta { margin-top: 10px; font-size: 0.9rem; }
         .footer { margin-top: 20px; padding-top: 10px; }
       }
@@ -238,8 +202,6 @@
         .status-rule { margin: 14px 0 10px; }
         .people-icon { width: clamp(70px, 11vw, 92px); }
         .status-message { margin: 10px 0 8px; font-size: 1rem; }
-        .meeting-focus { font-size: 1.05rem; }
-        .meeting-focus-time, .meeting-countdown, .meeting-attendance { font-size: 0.92rem; }
         .meeting-meta { margin-top: 8px; font-size: 0.9rem; }
       }
 
@@ -252,8 +214,6 @@
         .status-rule { margin: 10px 0 8px; }
         .people-icon { width: 62px; }
         .status-message { margin: 8px 0 6px; font-size: 0.95rem; }
-        .meeting-focus { font-size: 1rem; }
-        .meeting-focus-time, .meeting-countdown, .meeting-attendance { font-size: 0.9rem; }
         .meeting-meta { margin-top: 6px; font-size: 0.88rem; }
       }
     </style>
@@ -266,7 +226,7 @@
       </aside>
 
       <header class="heading">
-        <h1>Meeting Room 3A</h1>
+        <h1>Meeting Room 1</h1>
         <p>Connecting Fun and More</p>
       </header>
 
@@ -277,7 +237,9 @@
 
       <section class="schedule-panel" aria-labelledby="scheduleHeading">
         <h2 id="scheduleHeading">Today's Schedule</h2>
-        <div class="schedule-list" id="scheduleList"></div>
+        <div class="schedule-list" id="scheduleList">
+          <p class="empty-schedule">No meetings scheduled</p>
+        </div>
       </section>
 
       <section class="status-shell vacant" id="statusShell" aria-live="polite">
@@ -289,11 +251,7 @@
             <path d="M48 110v-20c0-19 14-34 32-34s32 15 32 34v20H48Z"></path><path d="M13 104V85c0-15 12-27 27-27 8 0 15 3 20 8M147 104V85c0-15-12-27-27-27-8 0-15 3-20 8"></path>
           </svg>
           <p class="status-message" id="statusMessage">This room is currently available</p>
-          <div class="meeting-focus" id="focusTitle">Design Review</div>
-          <div class="meeting-focus-time" id="focusTime">10:00 AM – 11:00 AM</div>
-          <div class="meeting-countdown" id="focusCountdown">Ends in 00:30:00</div>
-          <div class="meeting-attendance" id="attendanceCount">5 people in room</div>
-          <div class="meeting-meta" id="focusMeta">Host: A. Tanaka<br />Attendees: 5</div>
+          <div class="meeting-meta" id="focusMeta">Host:<br />Attendees:</div>
         </div>
       </section>
 
@@ -301,80 +259,10 @@
     </main>
 
     <script>
-      const meetings = [
-        { start: 10 * 60, end: 11 * 60, title: 'Product Review', host: 'A. Tanaka', attendees: 5 },
-        { start: 14 * 60, end: 15 * 60, title: 'Team Sync', host: 'J. Reyes', attendees: 6 },
-        { start: 16 * 60, end: 17 * 60, title: 'Project Kickoff', host: 'M. Santos', attendees: 8 }
-      ];
-      let selectedMeetingIndex = null;
-
-      const formatTime = minutes => {
-        const hour = Math.floor(minutes / 60);
-        const minute = minutes % 60;
-        const suffix = hour >= 12 ? 'PM' : 'AM';
-        const displayHour = hour % 12 || 12;
-        return `${displayHour}:${minute.toString().padStart(2, '0')} ${suffix}`;
-      };
-
-      const formatDuration = totalSeconds => {
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        return [hours, minutes, seconds].map(value => String(value).padStart(2, '0')).join(':');
-      };
-
-      function renderSchedule(currentMinutes) {
-        const list = document.getElementById('scheduleList');
-        list.innerHTML = '';
-        meetings.forEach((meeting, index) => {
-          if (currentMinutes >= meeting.start && currentMinutes < meeting.end) return;
-          const item = document.createElement('button');
-          item.type = 'button';
-          item.className = `meeting${selectedMeetingIndex === index ? ' selected' : ''}`;
-          item.setAttribute('aria-pressed', String(selectedMeetingIndex === index));
-          item.setAttribute('aria-label', `View details for ${meeting.title}`);
-          item.innerHTML = `<span class="meeting-bar"></span><span class="meeting-icon" aria-hidden="true">▣</span><div><div class="meeting-name"></div><div class="meeting-time"></div></div><span class="chevron" aria-hidden="true">›</span>`;
-          item.querySelector('.meeting-name').textContent = meeting.title;
-          item.querySelector('.meeting-time').textContent = `${formatTime(meeting.start)} – ${formatTime(meeting.end)}`;
-          item.addEventListener('click', () => {
-            selectedMeetingIndex = selectedMeetingIndex === index ? null : index;
-            updateDisplay();
-          });
-          list.appendChild(item);
-        });
-      }
-
       function updateDisplay() {
         const now = new Date();
-        const minutes = now.getHours() * 60 + now.getMinutes();
-        const next = meetings.find(meeting => meeting.start > minutes);
-        const selected = selectedMeetingIndex === null ? null : meetings[selectedMeetingIndex];
-        const focus = selected || next;
-        const countdown = document.getElementById('focusCountdown');
-        const attendance = document.getElementById('attendanceCount');
-
         document.getElementById('currentTime').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         document.getElementById('todayLabel').textContent = now.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('statusWord').textContent = 'Vacant';
-        document.getElementById('statusMessage').textContent = 'This room is currently available';
-        document.getElementById('statusShell').className = 'status-shell vacant';
-        document.getElementById('statusCard').className = 'status-card vacant';
-
-        if (focus) {
-          document.getElementById('focusTitle').textContent = selected ? `Scheduled: ${focus.title}` : `Next: ${focus.title}`;
-          document.getElementById('focusTime').textContent = `${formatTime(focus.start)} – ${formatTime(focus.end)}`;
-          document.getElementById('focusMeta').innerHTML = `Host: ${focus.host}<br />Attendees: ${focus.attendees}`;
-          attendance.textContent = `${focus.attendees} ${focus.attendees === 1 ? 'person' : 'people'} in room`;
-          countdown.textContent = `Duration: ${formatDuration((focus.end - focus.start) * 60)}`;
-        } else {
-          document.getElementById('focusTitle').textContent = 'No more meetings today';
-          document.getElementById('focusTime').textContent = '';
-          countdown.textContent = '';
-          attendance.textContent = '';
-          document.getElementById('focusMeta').textContent = '';
-        }
-
-        renderSchedule(minutes);
       }
 
       updateDisplay();

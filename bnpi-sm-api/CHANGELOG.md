@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Removed the seeded demo bookings ("Weekly sync", "VIP client visit") from `db/seeds/bookings.seed.mjs` — a fresh database now starts with no bookings, and the demo calendar fills only via the UI/API. The bookings seed remains as a documented no-op target.
+
 ### Added
 
 - **BDSS Phase 1 domain** — room-booking system for Bandai Namco Philippines:

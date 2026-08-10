@@ -114,7 +114,6 @@ body.tablet {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-giant);
-  letter-spacing: -0.02em;
   line-height: 1;
 }
 .stage.busy .status-word { color: var(--bn-red); }

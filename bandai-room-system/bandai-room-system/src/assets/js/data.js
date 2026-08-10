@@ -6,19 +6,17 @@
 
 const DB = {
   rooms: [
-    { id: "r1", name: "Meeting Room 3A", floor: "3F", capacity: 8,  sensor: "PIR-3A-01", tablet: "TAB-3A", status: "occupied" },
+    { id: "r1", name: "Meeting Room 1", floor: "3F", capacity: 8,  sensor: "PIR-3A-01", tablet: "TAB-3A", status: "available" },
     { id: "r2", name: "Meeting Room 3B", floor: "3F", capacity: 6,  sensor: "PIR-3B-01", tablet: "TAB-3B", status: "available" },
     { id: "r3", name: "Board Room 5F",   floor: "5F", capacity: 14, sensor: "PIR-5F-01", tablet: "TAB-5F", status: "available" },
-    { id: "r4", name: "Huddle Pod 2C",   floor: "2F", capacity: 4,  sensor: "PIR-2C-01", tablet: "TAB-2C", status: "occupied" },
+    { id: "r4", name: "Huddle Pod 2C",   floor: "2F", capacity: 4,  sensor: "PIR-2C-01", tablet: "TAB-2C", status: "available" },
   ],
 
   meetings: [
-    { id: "m1", roomId: "r1", title: "Product Review",  date: "2024-05-23", start: "10:00", end: "11:00", host: "A. Tanaka",   attendees: 5, status: "ongoing"  },
     { id: "m2", roomId: "r1", title: "Team Sync",       date: "2024-05-23", start: "14:00", end: "15:00", host: "M. Sato",     attendees: 7, status: "upcoming" },
     { id: "m3", roomId: "r1", title: "Project Kickoff", date: "2024-05-23", start: "16:00", end: "17:00", host: "K. Reyes",    attendees: 6, status: "upcoming" },
     { id: "m4", roomId: "r2", title: "Design Critique", date: "2024-05-23", start: "13:00", end: "14:00", host: "J. Cruz",     attendees: 4, status: "upcoming" },
     { id: "m5", roomId: "r3", title: "Exec Briefing",   date: "2024-05-23", start: "15:30", end: "16:30", host: "L. Yamamoto", attendees: 10, status: "upcoming" },
-    { id: "m6", roomId: "r4", title: "Sprint Planning", date: "2024-05-23", start: "10:30", end: "11:30", host: "R. Villanueva", attendees: 4, status: "ongoing" },
   ],
 
   users: [

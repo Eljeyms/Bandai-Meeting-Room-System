@@ -1,4 +1,4 @@
-/* Tablet display logic for one room (defaults to r1 / Meeting Room 3A).
+/* Tablet display logic for one room (defaults to r1 / Meeting Room 1).
    Occupancy comes from DB.rooms[].status — in production this is the
    sensor feed (PIR / camera / BLE headcount) pushed over WebSocket. */
 
