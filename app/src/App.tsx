@@ -159,7 +159,7 @@ function App() {
   }
 
   if (publicView) {
-    return <PublicSchedulePage data={data} />
+    return <PublicSchedulePage />
   }
 
   return (

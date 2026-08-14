@@ -144,12 +144,14 @@ export const detectRoom = async (roomId: string) => {
   return request<Room>('/api/ai/detect', { method: 'POST', body: JSON.stringify({ roomId }) })
 }
 
-export const exportReport = (rooms: Room[], meetings: Meeting[]) => {
+export const exportReport = (rooms: Room[], meetings: Meeting[], utilization: UtilizationDatum[]) => {
+  const usageRate = utilization.find((item) => item.day === 'Fri')?.pct ?? 0
+  const reportDate = new Date().toISOString().slice(0, 10)
   const rows = [
-    ['Room', 'Meetings today', 'Status'],
+    ['Date', 'Room', 'Location', 'Meetings today', 'Weekly meetings', 'Usage'],
     ...rooms.map((room) => {
       const count = meetings.filter((meeting) => meeting.roomId === room.id).length
-      return [room.name, count, room.status]
+      return [reportDate, room.name, room.floor, count, count, `${usageRate}%`]
     }),
   ]
   const csv = rows.map((row) => row.join(',')).join('\n')
